@@ -1,6 +1,8 @@
 import { createSpinBox } from './SpinBox.js';
 import { createBonusLogModal } from './BonusLogModal.js';
 
+let bonusHistory = {}; // Variabile globale per salvare la cronologia dei bonus
+
 export function createSpinView() {
   const view = document.createElement('div');
   view.className = 'spin-view';
@@ -24,26 +26,41 @@ export function createSpinView() {
     transitionDuration: 0
   });
 
+  // Call fetchSpinHistory when the view is created and handle the promise
+  fetchSpinHistory().catch(error => console.error('Error fetching spin history:', error));
 
   return view;
 }
 
-function fetchSpinHistory() {
+async function fetchSpinHistory() {
   const sites = ['goldbet', 'lottomatica', 'snai'];
-  sites.forEach(site => {
-    fetch(`https://legally-modest-joey.ngrok-free.app/spin-history/${site}`)
-      .then(response => response.json())
-      .then(data => updateSpinBox(site, data))
-      .catch(error => console.error(`Error fetching spin history for ${site}:`, error));
-  });
+  for (const site of sites) {
+    try {
+      const response = await fetch(`https://legally-modest-joey.ngrok-free.app/spin-history/${site}`, {
+        headers: {
+          'ngrok-skip-browser-warning': 'true' // Add this header to bypass the interstitial page
+        }
+      });
+      const data = await response.json();
+      bonusHistory[site] = data; // Salva la cronologia dei bonus nella variabile globale
+      updateSpinBox(site, data);
+    } catch (error) {
+      console.error(`Error fetching spin history for ${site}:`, error);
+    }
+  }
 }
 
 function performSpin(site) {
-  fetch(`https://legally-modest-joey.ngrok-free.app/spin/${site}`, { method: 'POST' })
+  fetch(`https://legally-modest-joey.ngrok-free.app/spin/${site}`, {
+    method: 'POST',
+    headers: {
+      'ngrok-skip-browser-warning': 'true' // Add this header to bypass the interstitial page
+    }
+  })
     .then(response => response.json())
     .then(result => {
       console.log(`Spin result for ${site}:`, result);
-      fetchSpinHistory();
+      fetchSpinHistory().catch(error => console.error('Error fetching spin history:', error));
     })
     .catch(error => console.error(`Error performing spin for ${site}:`, error));
 }
@@ -58,19 +75,22 @@ function updateSpinBox(site, spinHistory) {
 }
 
 function openBonusLog(site) {
-  fetch(`https://legally-modest-joey.ngrok-free.app/spin-history/${site}`)
-    .then(response => response.json())
-    .then(spinHistory => {
-      const modal = createBonusLogModal(site, spinHistory, formatDate, closeBonusLog);
-      document.body.appendChild(modal);
-    })
-    .catch(error => console.error(`Error fetching spin history for ${site}:`, error));
+  console.log(`Opening bonus log for site: ${site}`);
+  const spinHistory = bonusHistory[site]; // Recupera la cronologia dei bonus dalla variabile globale
+  if (spinHistory) {
+    const modal = createBonusLogModal(site, spinHistory, formatDate, closeBonusLog);
+    document.body.appendChild(modal);
+    console.log(`Bonus log modal added to DOM for site: ${site}`);
+  } else {
+    console.error(`No bonus history found for site: ${site}`);
+  }
 }
 
 function closeBonusLog() {
   const modal = document.querySelector('.modal-container');
   if (modal) {
     modal.remove();
+    console.log('Bonus log modal removed from DOM');
   }
 }
 

@@ -4,7 +4,7 @@ const urlsToCache = [
   '/index.html',
   '/main.js',
   '/manifest.json',
-  '/images/favicon.ico',
+  'images/favicon.ico',
   'images/logo192.png',
   'images/logo512.png'
 ];
@@ -17,8 +17,17 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  console.log(`Fetching: ${event.request.url}`);
   event.respondWith(
     caches.match(event.request)
-      .then((response) => response || fetch(event.request))
+      .then((response) => {
+        if (response) {
+          console.log(`Serving from cache: ${event.request.url}`);
+          return response;
+        }
+        console.log(`Fetching from network: ${event.request.url}`);
+        return fetch(event.request);
+      })
   );
 });
+

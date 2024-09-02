@@ -7,18 +7,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BetBox</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="%PUBLIC_URL%/PWA_React/manifest.json">
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/balanceView.css">
     <link rel="stylesheet" href="styles/spinView.css">
+    <link rel="stylesheet" href="styles/bonusLogModal.css"> <!-- Assicurati che il percorso sia corretto -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div id="root">
         <header>
-            <h1>Saldi</h1>
+            <h1>Spin</h1>
         </header>
-        <main id="content"></main>
+        <main id="content">
+            <div class="spin-view">
+                <div class="sites-container" style="position: relative; height: 0px;">
+                    <div class="card spin-box" data-site="goldbet" style="position: absolute; left: 0px; top: 0px;">
+                        <div class="top-row">
+                            <img src="http://192.168.0.58:8080/images/siteIcons/Goldbet.imageset/Goldbet.png" class="icon">
+                            <span class="spin-button">↻</span>
+                        </div>
+                        <p class="bonus-text">Ultimo bonus: N/A</p>
+                        <span class="history-button">Visualizza cronologia</span>
+                    </div>
+                    <div class="card spin-box" data-site="lottomatica" style="position: absolute; left: 0px; top: 0px;">
+                        <div class="top-row">
+                            <img src="http://192.168.0.58:8080/images/siteIcons/Lottomatica.imageset/Better.png" class="icon">
+                            <span class="spin-button">↻</span>
+                        </div>
+                        <p class="bonus-text">Ultimo bonus: Bonus Scommesse: 0.50 €</p>
+                        <span class="history-button">Visualizza cronologia</span>
+                    </div>
+                    <div class="card spin-box" data-site="snai" style="position: absolute; left: 0px; top: 0px;">
+                        <div class="top-row">
+                            <img src="http://192.168.0.58:8080/images/siteIcons/Snai.imageset/Snai.png" class="icon">
+                            <span class="spin-button">↻</span>
+                        </div>
+                        <p class="bonus-text">Ultimo bonus: N/A</p>
+                        <span class="history-button">Visualizza cronologia</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <nav>
+            <a href="#"><i class="fas fa-wallet"></i></a>
+            <a href="#"><i class="fas fa-sync"></i></a>
+        </nav>
     </div>
     <script type="module" src="scripts/main.js"></script>
     <script>
