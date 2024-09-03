@@ -84,16 +84,21 @@ function updateSpinBox(site, spinHistory) {
   const spinBox = document.querySelector(`.spin-box[data-site="${site}"]`);
   if (spinBox && spinHistory.length > 0) {
     const lastSpin = spinHistory[spinHistory.length - 1];
-    const bonusText = spinBox.querySelector('.bonus-text');
-    bonusText.textContent = `Ultimo bonus: ${lastSpin.result.tipo}: ${lastSpin.result.valore}`;
+    const bonusValue = spinBox.querySelector('.bonus-value');
+    if (bonusValue) {
+      bonusValue.textContent = `Ultimo bonus: ${lastSpin.result ? `${lastSpin.result.tipo}: ${lastSpin.result.valore}` : 'N/A'}`;
+    } else {
+      console.error(`Elemento .bonus-value non trovato per il sito ${site}`);
+    }
     const today = new Date().toISOString().split('T')[0];
-    if (lastSpin.date.split('T')[0] === today && lastSpin.result.tipo !== 'N/A') {
+    if (lastSpin.date.split('T')[0] === today && lastSpin.result && lastSpin.result.tipo !== 'N/A') {
       spinBox.classList.add('bonus-today'); // Aggiungi la classe per lo sfondo verde
     } else {
       spinBox.classList.remove('bonus-today'); // Rimuovi la classe se non è un bonus odierno
     }
   }
 }
+
 
 function openBonusLog(site) {
   console.log(`Opening bonus log for site: ${site}`);
