@@ -73,3 +73,7 @@
   text-align: center;
 }
 
+.bonus-today {
+  background-color: rgba(0, 128, 0, 0.2); 
+}
+

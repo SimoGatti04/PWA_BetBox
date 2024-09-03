@@ -91,10 +91,10 @@ function updateSpinBox(site, spinHistory) {
       console.error(`Elemento .bonus-value non trovato per il sito ${site}`);
     }
     const today = new Date().toISOString().split('T')[0];
-    if (lastSpin.date.split('T')[0] === today && lastSpin.result && lastSpin.result.tipo !== 'N/A') {
+    if (lastSpin.date.split('T')[0] === today && lastSpin.result && lastSpin.result.tipo !== 'Nullo') {
       spinBox.classList.add('bonus-today'); // Aggiungi la classe per lo sfondo verde
     } else {
-      spinBox.classList.remove('bonus-today'); // Rimuovi la classe se non è un bonus odierno
+      spinBox.classList.remove('bonus-today'); // Rimuovi la classe se non è un bonus odierno non nullo
     }
   }
 }

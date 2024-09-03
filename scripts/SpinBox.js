@@ -30,7 +30,7 @@ export function createSpinBox(site, lastBonus, onSpinClick, onViewLogClick) {
   bonusContainer.appendChild(bonusLabel);
 
   const bonusValue = document.createElement('p');
-  bonusValue.className = 'bonus-value'; // Assicurati che la classe sia corretta
+  bonusValue.className = 'bonus-value';
   bonusValue.textContent = lastBonus ? `${lastBonus.result.tipo}: ${lastBonus.result.valore}` : 'N/A';
   bonusContainer.appendChild(bonusValue);
 
