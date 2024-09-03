@@ -13,6 +13,8 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    width: 40vw;
+    height: 20vw;
 }
 
 
@@ -24,13 +26,16 @@
 
 .balance-text {
     color: #fff;
-    font-size: 16px;
+    font-size: 4vw;
     font-weight: bold;
     text-align: center;
+    top: 29%;
+    left: 45%;
+    position: absolute;
 }
 
 .refresh-button {
-    position: absolute;
+    position: relative;
     top: 10px;
     right: 10px;
     background: none;
@@ -41,35 +46,22 @@
     z-index: 10;
 }
 
-
-.button-container {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
 .history-button {
     background: none;
     border: none;
     color: #0a84ff;
     font-size: 50px;
     cursor: pointer;
-    margin-bottom: 65px;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    line-height: 1;
+    position: relative;
+    top: -10%;
+    width: 5vw;
+    height: 5vw;
 }
 
-.history-button i {
+.history-button i{
     font-size: 20px;
 }
+
 
 .play-button {
     background: none;
@@ -77,21 +69,33 @@
     color: #0a84ff;
     font-size: 20px;
     cursor: pointer;
-    margin-top: 75px;
-    margin-left: 10px;
+    position: relative;
+    top: 200%;
+    left: 25%;
+    height: 5vw;
+    width: 5vw;
 }
 
 .log-button {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    background: none;
+    position: relative;
+    width: 5vw;
+    height: 5vw;
+    top: 3%;
+    right: 1.5%;
+    background: transparent none;
     border: none;
+    font-size: 130%;
     color: #0a84ff;
-    font-size: 20px;
     cursor: pointer;
 }
 
+.button-container{
+    position: relative;
+    left: 80%;
+    bottom: 30%;
+    height: 30vw;
+    width: 10vw;
+}
 
 
 
