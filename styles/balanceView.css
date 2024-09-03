@@ -142,7 +142,7 @@
         font-size: 1.75rem;
         cursor: pointer;
         bottom: 4.25rem;
-        left: 1rem;
+        left: 0rem;
         height: 2rem;
         width: 2rem;
     }
@@ -169,15 +169,13 @@
         width: 2rem;
         height: 2rem;
         top: 5.1rem;
-        left: 0.5rem;
+        left: -0.5rem;
         background: transparent none;
         border: none;
         font-size: 1.5rem;
         color: #0a84ff;
         cursor: pointer;
     }
-
-
 
 }
 
