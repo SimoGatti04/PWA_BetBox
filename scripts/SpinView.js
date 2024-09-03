@@ -86,7 +86,7 @@ function updateSpinBox(site, spinHistory) {
     const lastSpin = spinHistory[spinHistory.length - 1];
     const bonusValue = spinBox.querySelector('.bonus-value');
     if (bonusValue) {
-      bonusValue.textContent = `Ultimo bonus: ${lastSpin.result ? `${lastSpin.result.tipo}: ${lastSpin.result.valore}` : 'N/A'}`;
+      bonusValue.textContent = `${lastSpin.result ? `${lastSpin.result.tipo}: ${lastSpin.result.valore}` : 'N/A'}`;
     } else {
       console.error(`Elemento .bonus-value non trovato per il sito ${site}`);
     }

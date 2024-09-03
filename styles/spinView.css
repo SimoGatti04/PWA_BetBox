@@ -25,15 +25,6 @@
   top: auto;
 }
 
-.history-button {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  color: #0a84ff;
-  font-size: 14px;
-  cursor: pointer;
-}
-
 .spin-button {
   color: #0a84ff;
   font-size: 24px;
@@ -68,16 +59,34 @@
 }
 
 .bonus-today {
-  background-color: rgba(0, 128, 0, 0.2);
+  background-color: rgba(0, 128, 0, 0.35);
 }
 
 @media (max-width: 390px) {
-    .spin-button {
-        left: 80%;
-    }
+  .spin-button {
+    left: 18.8rem;
+  }
 
   .spin-box{
     width: 19.1rem;
+  }
+
+  .view-log-button{
+    width: 15rem;
+  }
+
+  .bonus-value{
+    position: absolute;
+    width: 15rem;
+    top: -3.9rem;
+    left: -7.4rem;
+  }
+
+  .bonus-label{
+    position: absolute;
+    top: -6rem;
+    left: -7.35rem;
+    width: 15rem;
   }
 }
 
