@@ -71,4 +71,14 @@
   background-color: rgba(0, 128, 0, 0.2);
 }
 
+@media (max-width: 390px) {
+    .spin-button {
+        left: 80%;
+    }
+
+  .spin-box{
+    width: 19.1rem;
+  }
+}
+
 
