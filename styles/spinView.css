@@ -58,3 +58,9 @@
   cursor: pointer;
 }
 
+/* Aggiungi questa classe al file CSS */
+.spin-box.bonus-today {
+  background-color: rgba(0, 255, 0, 0.1); /* Verde leggero */
+}
+
+
