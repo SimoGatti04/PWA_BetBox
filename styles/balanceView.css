@@ -51,15 +51,16 @@
     background: none;
     border: none;
     color: #0a84ff;
-    font-size: 50px;
     cursor: pointer;
-    top: 1%;
+    top: -3%;
     width: 5vw;
     height: 5vw;
 }
 
 .history-button i{
-    font-size: 20px;
+    font-size: 5vh;
+    position: absolute;
+    left: 60%;
 }
 
 
@@ -68,9 +69,9 @@
     background: none;
     border: none;
     color: #0a84ff;
-    font-size: 20px;
+    font-size: 5vh;
     cursor: pointer;
-    bottom: 30%;
+    bottom: 31%;
     left: 25%;
     height: 5vw;
     width: 5vw;
@@ -80,11 +81,11 @@
     position: absolute;
     width: 5vw;
     height: 5vw;
-    top: 70%;
-    left: 5%;
+    top: 75%;
+    left: 1.5%;
     background: transparent none;
     border: none;
-    font-size: 130%;
+    font-size: 5vh;
     color: #0a84ff;
     cursor: pointer;
 }
@@ -96,5 +97,10 @@
     width: 10vw;
 }
 
+@media (max-width: 1180px) {
+    .play-button{
+        left: 0%;
+    }
+}
 
 
