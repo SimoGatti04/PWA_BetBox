@@ -212,12 +212,25 @@ function displayBalanceHistory(site, history) {
 }
 
 
-function updateBalance(site, balance) {
+function updateBalance(site, balanceData) {
     const balances = loadBalances();
-    balances[site] = balance;
+    let balanceToDisplay = 'N/A';
+
+    if (balanceData && typeof balanceData === 'object') {
+        if (balanceData.balance) {
+            balanceToDisplay = balanceData.balance;
+        } else if (balanceData.date && balanceData.balance) {
+            balanceToDisplay = balanceData.balance;
+        }
+    } else if (typeof balanceData === 'string') {
+        balanceToDisplay = balanceData;
+    }
+
+    balances[site] = balanceToDisplay;
     saveBalances(balances);
     renderBalances(balances);
 }
+
 
 function renderBalances(balances) {
     const cards = document.querySelectorAll('.card');
