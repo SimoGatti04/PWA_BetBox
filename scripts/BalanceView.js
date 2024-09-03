@@ -73,7 +73,13 @@ function createBalanceCard(site, balance) {
     const historyButton = document.createElement('button');
     historyButton.className = 'history-button';
     historyButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
-    historyButton.addEventListener('click', () => fetchBalanceHistory(site));
+    historyButton.addEventListener('click', async () => {
+        const history = await fetchBalanceHistory(site);
+        if (history) {
+            const latestBalance = history[history.length - 1];
+            updateBalance(site, latestBalance);
+        }
+    }); // Aggiorna il saldo senza visualizzare il modal
     buttonContainer.appendChild(historyButton);
 
     const playButton = document.createElement('button');
@@ -87,20 +93,31 @@ function createBalanceCard(site, balance) {
     const logButton = document.createElement('button');
     logButton.className = 'log-button';
     logButton.innerHTML = '<i class="fas fa-clipboard-list"></i>';
-    logButton.addEventListener('click', () => openBalanceHistory(site));
+    logButton.addEventListener('click', () => {
+        const balanceHistory = loadBalanceHistory();
+        const history = balanceHistory[site] || [];
+        const modal = createBalanceHistoryModal(site, history);
+        document.body.appendChild(modal);
+    }); // Visualizza il modal
     card.appendChild(logButton);
 
     return card;
 }
 
-function openBalanceHistory(site) {
-    fetchBalanceHistory(site).then(history => {
+async function openBalanceHistory(site) {
+    const history = await fetchBalanceHistory(site);
+    if (history) {
         const modal = createBalanceHistoryModal(site, history);
         document.body.appendChild(modal);
-    });
+    } else {
+        console.error('Errore nel recupero della cronologia dei saldi:', error);
+    }
 }
 
+
 function createBalanceHistoryModal(site, history) {
+    console.log(`Creazione del modal per ${site} con i dati:`, history); // Log dei dati passati alla funzione
+
     const modalContainer = document.createElement('div');
     modalContainer.className = 'modal-container';
 
@@ -120,17 +137,25 @@ function createBalanceHistoryModal(site, history) {
     const balanceList = document.createElement('ul');
     balanceList.className = 'balance-list';
 
-    history.forEach(entry => {
+    if (Array.isArray(history)) {
+        history.forEach(entry => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${formatDate(entry.date)} - ${entry.balance}`;
+            balanceList.appendChild(listItem);
+        });
+    } else {
         const listItem = document.createElement('li');
-        listItem.textContent = `${formatDate(entry.date)} - ${entry.balance}`;
+        listItem.textContent = 'Nessuna cronologia disponibile';
         balanceList.appendChild(listItem);
-    });
+    }
 
     modalContent.appendChild(balanceList);
     modalContainer.appendChild(modalContent);
 
     return modalContainer;
 }
+
+
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -174,6 +199,8 @@ async function fetchBalance(site) {
         updateBalance(site, 'Errore');
     }
 }
+let isFetchingHistory = false;
+
 async function fetchBalanceHistory(site) {
     try {
         const response = await fetch(`https://legally-modest-joey.ngrok-free.app/balance-history/${site}`, {
@@ -189,17 +216,36 @@ async function fetchBalanceHistory(site) {
         }
 
         const data = await response.json();
+        console.log(`Dati ricevuti per ${site}:`, data); // Log dei dati ricevuti
 
         if (!Array.isArray(data) || data.length === 0) {
             throw new Error('Cronologia non disponibile');
         }
 
-        displayBalanceHistory(site, data);
+        // Salva i dati recuperati in modo persistente
+        saveBalanceHistory(site, data);
+
+        return data; // Restituisci i dati
     } catch (error) {
         console.error('Errore nel recupero della cronologia dei saldi:', error);
-        displayBalanceHistory(site, null);
+        return null; // Restituisci null in caso di errore
     }
 }
+
+function saveBalanceHistory(site, history) {
+    const balanceHistory = loadBalanceHistory();
+    balanceHistory[site] = history;
+    localStorage.setItem('balanceHistory', JSON.stringify(balanceHistory));
+}
+
+function loadBalanceHistory() {
+    const balanceHistory = localStorage.getItem('balanceHistory');
+    return balanceHistory ? JSON.parse(balanceHistory) : {};
+}
+
+
+
+
 function displayBalanceHistory(site, history) {
     if (history === null) {
         console.log(`Cronologia saldi non disponibile per ${site}`);
@@ -239,9 +285,41 @@ function renderBalances(balances) {
     });
 }
 
+function checkAndFetchBalancesOnceADay() {
+    const lastFetchDate = localStorage.getItem('lastFetchDate');
+    const currentDate = new Date();
+    const currentHour = currentDate.getHours();
+
+    // Controlla se l'ultima fetch è stata fatta oggi dopo le 10 di mattina
+    if (lastFetchDate) {
+        const lastFetch = new Date(lastFetchDate);
+        const isSameDay = currentDate.toDateString() === lastFetch.toDateString();
+        const isAfter10AM = currentHour >= 10;
+
+        if (isSameDay && isAfter10AM) {
+            console.log('Le route sono già state chiamate oggi dopo le 10 di mattina.');
+            return;
+        }
+    }
+
+    // Se non è stata fatta oggi dopo le 10 di mattina, chiama le route
+    if (currentHour >= 10) {
+        fetchAllSingleBoxRoutes();
+        localStorage.setItem('lastFetchDate', currentDate.toISOString());
+    }
+}
+
+async function fetchAllSingleBoxRoutes() {
+    const sites = ['goldbet', 'bet365', 'eurobet', 'sisal', 'snai', 'lottomatica', 'cplay'];
+    for (const site of sites) {
+        await fetchBalanceHistory(site);
+    }
+}
+
 function initializeBalances() {
     const balances = loadBalances();
     renderBalances(balances);
+    checkAndFetchBalancesOnceADay();
 }
 
 document.addEventListener('DOMContentLoaded', initializeBalances);
