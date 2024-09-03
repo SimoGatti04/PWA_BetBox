@@ -41,15 +41,6 @@
     z-index: 10;
 }
 
-.refresh-all-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
 
 .button-container {
     position: absolute;
@@ -101,17 +92,6 @@
     cursor: pointer;
 }
 
-.refresh-all-button {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: none;
-    border: none;
-    color: #0a84ff;
-    font-size: 24px;
-    cursor: pointer;
-}
 
-.refresh-all-button i {
-    font-size: 24px;
-}
+
+

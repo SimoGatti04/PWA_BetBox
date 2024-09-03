@@ -22,14 +22,29 @@ body {
 }
 
 header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 20px;
+    background-color: transparent;
 }
 
 header h1 {
     font-size: 32px;
     font-weight: bold;
-    margin: 0;
+    margin: 5px;
+    color: white;
 }
+
+.refresh-all-button {
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.5em;
+    color: #0a84ff;
+    background: none;
+    border: none;
+}
+
 
 main {
     flex: 1;
@@ -48,7 +63,6 @@ nav {
   z-index: 1000;
 }
 
-
 nav a {
   color: #fff;
   font-size: 24px;
@@ -59,7 +73,6 @@ nav a {
 nav a.active {
   color: #0a84ff;
 }
-
 
 @media (min-width: 768px) {
     .balances-container {
@@ -107,13 +120,4 @@ nav a.active {
     .refresh-button {
         font-size: 28px;
     }
-}
-
-
-.refresh-all-button {
-    background: none;
-    border: none;
-    color: #0a84ff;
-    font-size: 24px;
-    cursor: pointer;
 }

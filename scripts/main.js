@@ -1,7 +1,6 @@
 import { createBalanceView, fetchAllRecentBalances } from './BalanceView.js';
 import { createSpinView } from './SpinView.js';
 
-
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.getElementById('root');
   const nav = createNavigation();
@@ -36,7 +35,6 @@ function createNavLink(text, iconClass, onClick) {
   return link;
 }
 
-
 function showBalanceView() {
   updateHeaderTitle('Saldi');
   const contentContainer = document.querySelector('main#content');
@@ -53,14 +51,12 @@ function showBalanceView() {
   contentContainer.appendChild(createBalanceView());
 }
 
-
 function showSpinView() {
   updateHeaderTitle('Spin');
   const contentContainer = document.querySelector('main#content');
   contentContainer.innerHTML = '';
   contentContainer.appendChild(createSpinView());
 }
-
 
 function updateHeaderTitle(title) {
   const header = document.querySelector('header');
@@ -71,5 +67,3 @@ function updateHeaderTitle(title) {
     header.appendChild(h1);
   }
 }
-
-

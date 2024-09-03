@@ -1,6 +1,6 @@
 import { siteImages } from './siteImages.js';
 
-export function createSpinBox(site, lastBonus, onSpin, onViewHistory) {
+export function createSpinBox(site, lastBonus, onSpinClick, onViewLogClick) {
   const box = document.createElement('div');
   box.className = 'card spin-box';
   box.dataset.site = site;
@@ -8,32 +8,44 @@ export function createSpinBox(site, lastBonus, onSpin, onViewHistory) {
   const topRow = document.createElement('div');
   topRow.className = 'top-row';
 
-  const logo = document.createElement('img');
-  logo.src = siteImages[site];
-  logo.className = 'icon';
-  topRow.appendChild(logo);
+  const icon = document.createElement('img');
+  icon.src = siteImages[site];
+  icon.className = 'icon';
+  topRow.appendChild(icon);
 
-  const spinButton = document.createElement('span');
+  const spinButton = document.createElement('button');
   spinButton.className = 'spin-button';
-  spinButton.textContent = '↻';
-  spinButton.addEventListener('click', onSpin);
+  spinButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
+  spinButton.addEventListener('click', onSpinClick);
   topRow.appendChild(spinButton);
 
   box.appendChild(topRow);
 
-  const bonusText = document.createElement('p');
-  bonusText.className = 'bonus-text';
-  bonusText.textContent = `Ultimo bonus: ${renderBonus(lastBonus)}`;
-  box.appendChild(bonusText);
+  const bonusContainer = document.createElement('div');
+  bonusContainer.className = 'bonus-container';
 
-  const historyButton = document.createElement('span');
-  historyButton.className = 'history-button';
-  historyButton.textContent = 'Visualizza cronologia';
-  historyButton.addEventListener('click', onViewHistory);
-  box.appendChild(historyButton);
+  const bonusLabel = document.createElement('p');
+  bonusLabel.className = 'bonus-label';
+  bonusLabel.textContent = 'Ultimo bonus:';
+  bonusContainer.appendChild(bonusLabel);
+
+  const bonusValue = document.createElement('p');
+  bonusValue.className = 'bonus-value';
+  bonusValue.textContent = lastBonus ? `${lastBonus.result.tipo}: ${lastBonus.result.valore}` : 'N/A';
+  bonusContainer.appendChild(bonusValue);
+
+  box.appendChild(bonusContainer);
+
+  const viewLogButton = document.createElement('button');
+  viewLogButton.className = 'view-log-button';
+  viewLogButton.textContent = 'Visualizza contenuto';
+  viewLogButton.addEventListener('click', onViewLogClick);
+  box.appendChild(viewLogButton);
 
   return box;
 }
+
+
 
 function renderBonus(lastBonus) {
   if (lastBonus && lastBonus.result) {

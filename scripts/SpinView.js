@@ -28,14 +28,6 @@ export function createSpinView() {
 
   view.appendChild(sitesContainer);
 
-  new Isotope(sitesContainer, {
-    itemSelector: '.spin-box',
-    layoutMode: 'vertical',
-    resize: false,
-    fitWidth: false,
-    transitionDuration: 0
-  });
-
   if (shouldFetch) {
     fetchSpinHistory().catch(error => console.error('Error fetching spin history:', error));
   }

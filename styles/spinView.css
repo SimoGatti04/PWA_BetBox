@@ -11,30 +11,18 @@
   margin-bottom: 30px;
 }
 
-.refresh-all-button {
-  position: absolute;
-  top: 120px;
-  right: 20px;
-  padding: 10px;
-  background: none;
-  border: none;
-  color: #0a84ff;
-  font-size: 24px;
-  cursor: pointer;
-}
-
 .sites-container {
   width: calc(100% - 20px);
   margin-right: 20px;
 }
 
-
 .spin-box {
-  width: 100% !important;
+  width: 100%;
+  height: 100px;
   margin-bottom: 20px;
-  position: relative !important;
-  left: auto !important;
-  top: auto !important;
+  position: relative;
+  left: auto;
+  top: auto;
 }
 
 .button-container {
@@ -56,11 +44,32 @@
   color: #0a84ff;
   font-size: 24px;
   cursor: pointer;
+  position: absolute;
+  left: 90%;
+  top: 20px;
+  background-color: transparent;
+  border: none;
 }
 
-/* Aggiungi questa classe al file CSS */
-.spin-box.bonus-today {
-  background-color: rgba(0, 255, 0, 0.1); /* Verde leggero */
+
+.view-log-button {
+  background: none;
+  border: none;
+  color: #0a84ff;
+  font-size: 16px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
 }
 
+.bonus-container{
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
 
