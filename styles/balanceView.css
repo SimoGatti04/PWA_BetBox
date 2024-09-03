@@ -97,5 +97,88 @@
     width: 1rem;
 }
 
+@media (max-width: 400px) {
+    .card {
+        position: relative;
+        background-color: #1c1c1e;
+        border-radius: 1rem;
+        padding: 1.4rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 8rem;
+        height: 5rem;
+    }
+
+    .icon{
+        width: 3.25rem;
+        height: 3.25rem;
+        left: 0.7rem;
+        top: 0.55rem;
+    }
+
+    .balance-text {
+        position: absolute;
+        color: white;
+        font-size: 1.35rem;
+        font-weight: bold;
+        text-align: center;
+        top: 2.5rem;
+        left: 4.5rem;
+    }
+
+    .button-container {
+        position: absolute;
+        left: 7rem;
+        height: 10rem;
+        width: 1rem;
+    }
+
+    .play-button {
+        position: absolute;
+        background: none;
+        border: none;
+        color: #0a84ff;
+        font-size: 1.75rem;
+        cursor: pointer;
+        bottom: 4.25rem;
+        left: 1rem;
+        height: 2rem;
+        width: 2rem;
+    }
+
+    .history-button{
+        position: absolute;
+        background: none;
+        border: none;
+        color: #0a84ff;
+        cursor: pointer;
+        top: -1.25rem;
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .history-button i {
+        font-size: 1.5rem;
+        position: absolute;
+        left: 0.7rem;
+    }
+
+    .log-button {
+        position: absolute;
+        width: 2rem;
+        height: 2rem;
+        top: 5.1rem;
+        left: 0.5rem;
+        background: transparent none;
+        border: none;
+        font-size: 1.5rem;
+        color: #0a84ff;
+        cursor: pointer;
+    }
+
+
+
+}
 
 
