@@ -51,3 +51,67 @@
     cursor: pointer;
 }
 
+.button-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.history-button {
+    background: none;
+    border: none;
+    color: #0a84ff;
+    font-size: 50px;
+    cursor: pointer;
+    margin-bottom: 65px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    line-height: 1;
+}
+
+.history-button i {
+    font-size: 20px;
+}
+
+.play-button {
+    background: none;
+    border: none;
+    color: #0a84ff;
+    font-size: 20px;
+    cursor: pointer;
+    margin-top: 75px;
+    margin-left: 10px;
+}
+
+.log-button {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: none;
+    border: none;
+    color: #0a84ff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.refresh-all-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #0a84ff;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.refresh-all-button i {
+    font-size: 24px;
+}

@@ -13,12 +13,6 @@ export function createBalanceView() {
     const view = document.createElement('div');
     view.className = 'balances-container';
 
-    const refreshAllButton = document.createElement('button');
-    refreshAllButton.className = 'refresh-all-button';
-    refreshAllButton.innerHTML = '↻';
-    refreshAllButton.addEventListener('click', fetchAllRecentBalances);
-    view.appendChild(refreshAllButton);
-
     const sites = ['goldbet', 'bet365', 'eurobet', 'sisal', 'snai', 'lottomatica', 'cplay'];
     const balances = loadBalances();
 
@@ -30,7 +24,7 @@ export function createBalanceView() {
     return view;
 }
 
-async function fetchAllRecentBalances() {
+export async function fetchAllRecentBalances() {
     try {
         const response = await fetch('https://legally-modest-joey.ngrok-free.app/balance-history/recent', {
             method: 'GET',
@@ -73,24 +67,28 @@ function createBalanceCard(site, balance) {
     balanceText.textContent = balance || 'N/A';
     card.appendChild(balanceText);
 
-    const playButton = document.createElement('button');
-    playButton.className = 'play-button';
-    playButton.innerHTML = '▶';
-    playButton.addEventListener('click', () => fetchBalance(site));
-    card.appendChild(playButton);
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
 
     const historyButton = document.createElement('button');
     historyButton.className = 'history-button';
-    historyButton.textContent = '↻';
+    historyButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
     historyButton.addEventListener('click', () => fetchBalanceHistory(site));
-    card.appendChild(historyButton);
+    buttonContainer.appendChild(historyButton);
+
+    const playButton = document.createElement('button');
+    playButton.className = 'play-button';
+    playButton.innerHTML = '<i class="fas fa-play"></i>';
+    playButton.addEventListener('click', () => fetchBalance(site));
+    buttonContainer.appendChild(playButton);
+
+    card.appendChild(buttonContainer);
 
     const logButton = document.createElement('button');
     logButton.className = 'log-button';
-    logButton.innerHTML = '📋'; // Icona di log
+    logButton.innerHTML = '<i class="fas fa-clipboard-list"></i>';
     logButton.addEventListener('click', () => openBalanceHistory(site));
     card.appendChild(logButton);
-
 
     return card;
 }

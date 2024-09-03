@@ -1,5 +1,6 @@
-import { createBalanceView } from './BalanceView.js';
+import { createBalanceView, fetchAllRecentBalances } from './BalanceView.js';
 import { createSpinView } from './SpinView.js';
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.getElementById('root');
@@ -40,8 +41,18 @@ function showBalanceView() {
   updateHeaderTitle('Saldi');
   const contentContainer = document.querySelector('main#content');
   contentContainer.innerHTML = '';
+
+  const refreshAllButton = document.createElement('button');
+  refreshAllButton.className = 'refresh-all-button';
+  refreshAllButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
+  refreshAllButton.addEventListener('click', fetchAllRecentBalances);
+
+  const header = document.querySelector('header');
+  header.appendChild(refreshAllButton);
+
   contentContainer.appendChild(createBalanceView());
 }
+
 
 function showSpinView() {
   updateHeaderTitle('Spin');
@@ -52,8 +63,13 @@ function showSpinView() {
 
 
 function updateHeaderTitle(title) {
-  const header = document.querySelector('header h1');
+  const header = document.querySelector('header');
   if (header) {
-    header.textContent = title;
+    header.innerHTML = '';
+    const h1 = document.createElement('h1');
+    h1.textContent = title;
+    header.appendChild(h1);
   }
 }
+
+

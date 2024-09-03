@@ -108,3 +108,12 @@ nav a.active {
         font-size: 28px;
     }
 }
+
+
+.refresh-all-button {
+    background: none;
+    border: none;
+    color: #0a84ff;
+    font-size: 24px;
+    cursor: pointer;
+}
