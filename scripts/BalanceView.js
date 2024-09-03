@@ -312,7 +312,11 @@ function checkAndFetchBalancesOnceADay() {
 async function fetchAllSingleBoxRoutes() {
     const sites = ['goldbet', 'bet365', 'eurobet', 'sisal', 'snai', 'lottomatica', 'cplay'];
     for (const site of sites) {
-        await fetchBalanceHistory(site);
+        const history = await fetchBalanceHistory(site);
+        if (history) {
+            const latestBalance = history[history.length - 1];
+            updateBalance(site, latestBalance);
+        }
     }
 }
 
