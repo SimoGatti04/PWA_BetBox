@@ -57,19 +57,18 @@ function createBalanceCard(site, balance) {
     card.className = 'card';
     card.dataset.site = site;
 
-    const icon = document.createElement('img');
-    icon.src = siteImages[site];
-    icon.className = 'icon';
-    card.appendChild(icon);
+    // Crea un elemento immagine di sfondo
+    const backgroundImage = document.createElement('img');
+    backgroundImage.src = siteImages[site];
+    backgroundImage.className = 'background-image';
+    card.appendChild(backgroundImage);
 
     const balanceText = document.createElement('p');
     balanceText.className = 'balance-text';
     balanceText.textContent = balance || 'N/A';
     card.appendChild(balanceText);
 
-    const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'button-container';
-
+    // Pulsante per aggiornare il saldo (freccia)
     const historyButton = document.createElement('button');
     historyButton.className = 'history-button';
     historyButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
@@ -80,16 +79,16 @@ function createBalanceCard(site, balance) {
             updateBalance(site, latestBalance);
         }
     }); // Aggiorna il saldo senza visualizzare il modal
-    buttonContainer.appendChild(historyButton);
+    card.appendChild(historyButton);
 
+    // Pulsante per recuperare il saldo (play)
     const playButton = document.createElement('button');
     playButton.className = 'play-button';
     playButton.innerHTML = '<i class="fas fa-play"></i>';
     playButton.addEventListener('click', () => fetchBalance(site));
-    buttonContainer.appendChild(playButton);
+    card.appendChild(playButton);
 
-    card.appendChild(buttonContainer);
-
+    // Pulsante per visualizzare il log
     const logButton = document.createElement('button');
     logButton.className = 'log-button';
     logButton.innerHTML = '<i class="fas fa-clipboard-list"></i>';
@@ -103,6 +102,7 @@ function createBalanceCard(site, balance) {
 
     return card;
 }
+
 
 async function openBalanceHistory(site) {
     const history = await fetchBalanceHistory(site);

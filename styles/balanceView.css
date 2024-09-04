@@ -15,15 +15,24 @@
     justify-content: space-between;
     width: 35rem;
     height: 18rem;
+    background-size: cover; /* Aggiungi questa regola */
+    background-position: center; /* Aggiungi questa regola */
+    background-repeat: no-repeat; /* Aggiungi questa regola */
+    overflow: hidden; /* Assicurati che il contenuto non esca dai bordi */
 }
 
 
-.icon {
+.card .background-image {
     position: absolute;
-    width: 9rem;
-    height: 9rem;
-    object-fit: contain;
+    top: -1.25rem;
+    left: -1.5rem;
+    width: 13.8rem;
+    height: 10.5rem;
+    opacity: 0.2; /* Imposta l'opacità desiderata */
+    z-index: 0;
+    pointer-events: none; /* Assicurati che l'immagine di sfondo non interferisca con gli eventi di puntamento */
 }
+
 
 .balance-text {
     position: absolute;
@@ -90,12 +99,6 @@
     cursor: pointer;
 }
 
-.button-container{
-    position: absolute;
-    left: 30rem;
-    height: 27.2rem;
-    width: 1rem;
-}
 
 @media (max-width: 390px) {
     .card {
@@ -123,15 +126,8 @@
         font-size: 1.35rem;
         font-weight: bold;
         text-align: center;
-        top: 2.5rem;
-        left: 4.5rem;
-    }
-
-    .button-container {
-        position: absolute;
-        left: 7rem;
-        height: 10rem;
-        width: 1rem;
+        top: 1.80rem;
+        left: 4.1rem;
     }
 
     .play-button {
@@ -141,8 +137,8 @@
         color: #0a84ff;
         font-size: 1.75rem;
         cursor: pointer;
-        bottom: 4.25rem;
-        left: 0rem;
+        bottom: 5rem;
+        left:-0.35rem;
         height: 2rem;
         width: 2rem;
     }
@@ -153,7 +149,8 @@
         border: none;
         color: #0a84ff;
         cursor: pointer;
-        top: -1.25rem;
+        top: 0rem;
+        right: 1.5rem;
         width: 2rem;
         height: 2rem;
     }
