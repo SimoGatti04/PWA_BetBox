@@ -127,7 +127,7 @@
         font-weight: bold;
         text-align: center;
         top: 1.80rem;
-        left: 4.1rem;
+        left: 3.75rem;
     }
 
     .play-button {
@@ -137,8 +137,8 @@
         color: #0a84ff;
         font-size: 1.75rem;
         cursor: pointer;
-        bottom: 5rem;
-        left:-0.35rem;
+        bottom: 5.25rem;
+        left: -0.75rem;
         height: 2rem;
         width: 2rem;
     }
@@ -149,8 +149,8 @@
         border: none;
         color: #0a84ff;
         cursor: pointer;
-        top: 0rem;
-        right: 1.5rem;
+        top: -0.3rem;
+        right: 1rem;
         width: 2rem;
         height: 2rem;
     }
