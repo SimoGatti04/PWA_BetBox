@@ -1,8 +1,8 @@
 import { createSpinBox } from './SpinBox.js';
 import { createBonusLogModal } from './BonusLogModal.js';
 
-let bonusHistory = loadSpinHistory(); // Carica la cronologia dei bonus dal localStorage
-let isFetching = false; // Variabile di stato per tenere traccia delle richieste in corso
+let bonusHistory = loadSpinHistory();
+let isFetching = false;
 
 export function createSpinView() {
   const view = document.createElement('div');
@@ -22,7 +22,7 @@ export function createSpinView() {
     }
     const spinBox = createSpinBox(site, lastBonus, () => performSpin(site), () => openBonusLog(site));
     if (lastBonus && lastBonus.result.tipo !== 'N/A') {
-      spinBox.classList.add('bonus-today'); // Aggiungi la classe per lo sfondo verde
+      spinBox.classList.add('bonus-today');
     }
     sitesContainer.appendChild(spinBox);
   });
@@ -36,12 +36,10 @@ export function createSpinView() {
   return view;
 }
 
-// Funzione per salvare i bonus nel localStorage
 function saveSpinHistory(spinHistory) {
   localStorage.setItem('spinHistory', JSON.stringify(spinHistory));
 }
 
-// Funzione per caricare i bonus dal localStorage
 function loadSpinHistory() {
   const spinHistory = localStorage.getItem('spinHistory');
   return spinHistory ? JSON.parse(spinHistory) : {};
@@ -53,26 +51,26 @@ async function fetchSpinHistory() {
     return;
   }
 
-  isFetching = true; // Imposta lo stato a true per indicare che una richiesta è in corso
+  isFetching = true;
 
   const sites = ['goldbet', 'lottomatica', 'snai'];
   for (const site of sites) {
     try {
       const response = await fetch(`https://legally-modest-joey.ngrok-free.app/spin-history/${site}`, {
         headers: {
-          'ngrok-skip-browser-warning': 'true' // Add this header to bypass the interstitial page
+          'ngrok-skip-browser-warning': 'true'
         }
       });
       const data = await response.json();
-      bonusHistory[site] = data; // Salva la cronologia dei bonus nella variabile globale
+      bonusHistory[site] = data;
       updateSpinBox(site, data);
     } catch (error) {
       console.error(`Error fetching spin history for ${site}:`, error);
     }
   }
-  saveSpinHistory(bonusHistory); // Salva la cronologia dei bonus nel localStorage
+  saveSpinHistory(bonusHistory);
 
-  isFetching = false; // Reimposta lo stato a false dopo che la richiesta è completata
+  isFetching = false;
 }
 
 function performSpin(site) {
@@ -81,22 +79,22 @@ function performSpin(site) {
     return;
   }
 
-  isFetching = true; // Imposta lo stato a true per indicare che una richiesta è in corso
+  isFetching = true;
 
   fetch(`https://legally-modest-joey.ngrok-free.app/spin/${site}`, {
     method: 'POST',
     headers: {
-      'ngrok-skip-browser-warning': 'true' // Add this header to bypass the interstitial page
+      'ngrok-skip-browser-warning': 'true'
     }
   })
     .then(response => response.json())
     .then(result => {
       console.log(`Spin result for ${site}:`, result);
-      fetchSpinHistory().catch(error => console.error('Error fetching spin history:', error));
+      return fetchSpinHistory();
     })
     .catch(error => console.error(`Error performing spin for ${site}:`, error))
     .finally(() => {
-      isFetching = false; // Reimposta lo stato a false dopo che la richiesta è completata
+      isFetching = false;
     });
 }
 
@@ -112,16 +110,16 @@ function updateSpinBox(site, spinHistory) {
     }
     const today = new Date().toISOString().split('T')[0];
     if (lastSpin.date.split('T')[0] === today && lastSpin.result && lastSpin.result.tipo !== 'Nullo') {
-      spinBox.classList.add('bonus-today'); // Aggiungi la classe per lo sfondo verde
+      spinBox.classList.add('bonus-today');
     } else {
-      spinBox.classList.remove('bonus-today'); // Rimuovi la classe se non è un bonus odierno non nullo
+      spinBox.classList.remove('bonus-today');
     }
   }
 }
 
 function openBonusLog(site) {
   console.log(`Opening bonus log for site: ${site}`);
-  const spinHistory = bonusHistory[site]; // Recupera la cronologia dei bonus dalla variabile globale
+  const spinHistory = bonusHistory[site];
   if (spinHistory) {
     const modal = createBonusLogModal(site, spinHistory, formatDate, closeBonusLog);
     document.body.appendChild(modal);
@@ -149,3 +147,10 @@ function formatDate(dateString) {
     minute: '2-digit'
   });
 }
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && isFetching) {
+    console.log('Utente uscito dall\'app. Considero la richiesta chiusa.');
+    isFetching = false;
+  }
+});
