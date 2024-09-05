@@ -1,5 +1,7 @@
 import { siteImages } from './siteImages.js';
 
+let isFetching = false; // Variabile di stato per tenere traccia delle richieste in corso
+
 function saveBalances(balances) {
     localStorage.setItem('balances', JSON.stringify(balances));
 }
@@ -25,6 +27,13 @@ export function createBalanceView() {
 }
 
 export async function fetchAllRecentBalances() {
+    if (isFetching) {
+        console.log('Richiesta già in corso, evitando duplicati.');
+        return;
+    }
+
+    isFetching = true; // Imposta lo stato a true per indicare che una richiesta è in corso
+
     try {
         const response = await fetch('https://legally-modest-joey.ngrok-free.app/balance-history/recent', {
             method: 'GET',
@@ -42,6 +51,8 @@ export async function fetchAllRecentBalances() {
         updateAllBalances(data);
     } catch (error) {
         console.error('Errore nel recupero dei saldi recenti:', error);
+    } finally {
+        isFetching = false; // Reimposta lo stato a false dopo che la richiesta è completata
     }
 }
 
@@ -50,7 +61,6 @@ function updateAllBalances(balances) {
         updateBalance(site, balance);
     }
 }
-
 
 function createBalanceCard(site, balance) {
     const card = document.createElement('div');
@@ -103,7 +113,6 @@ function createBalanceCard(site, balance) {
     return card;
 }
 
-
 async function openBalanceHistory(site) {
     const history = await fetchBalanceHistory(site);
     if (history) {
@@ -113,7 +122,6 @@ async function openBalanceHistory(site) {
         console.error('Errore nel recupero della cronologia dei saldi:', error);
     }
 }
-
 
 function createBalanceHistoryModal(site, history) {
     console.log(`Creazione del modal per ${site} con i dati:`, history); // Log dei dati passati alla funzione
@@ -155,8 +163,6 @@ function createBalanceHistoryModal(site, history) {
     return modalContainer;
 }
 
-
-
 function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleString('it-IT', {
@@ -169,6 +175,13 @@ function formatDate(dateString) {
 }
 
 async function fetchBalance(site) {
+    if (isFetching) {
+        console.log(`Richiesta per il sito ${site} già in corso, evitando duplicati.`);
+        return;
+    }
+
+    isFetching = true; // Imposta lo stato a true per indicare che una richiesta è in corso
+
     try {
         console.log(`Recupero saldo per il sito: ${site}`);
         const response = await fetch(`https://legally-modest-joey.ngrok-free.app/balances/${site}`, {
@@ -197,11 +210,19 @@ async function fetchBalance(site) {
     } catch (error) {
         console.error('Errore nel recupero del saldo:', error);
         updateBalance(site, 'Errore');
+    } finally {
+        isFetching = false; // Reimposta lo stato a false dopo che la richiesta è completata
     }
 }
-let isFetchingHistory = false;
 
 async function fetchBalanceHistory(site) {
+    if (isFetching) {
+        console.log(`Richiesta per la cronologia del sito ${site} già in corso, evitando duplicati.`);
+        return;
+    }
+
+    isFetching = true; // Imposta lo stato a true per indicare che una richiesta è in corso
+
     try {
         const response = await fetch(`https://legally-modest-joey.ngrok-free.app/balance-history/${site}`, {
             method: 'GET',
@@ -229,6 +250,8 @@ async function fetchBalanceHistory(site) {
     } catch (error) {
         console.error('Errore nel recupero della cronologia dei saldi:', error);
         return null; // Restituisci null in caso di errore
+    } finally {
+        isFetching = false; // Reimposta lo stato a false dopo che la richiesta è completata
     }
 }
 
@@ -243,9 +266,6 @@ function loadBalanceHistory() {
     return balanceHistory ? JSON.parse(balanceHistory) : {};
 }
 
-
-
-
 function displayBalanceHistory(site, history) {
     if (history === null) {
         console.log(`Cronologia saldi non disponibile per ${site}`);
@@ -254,7 +274,6 @@ function displayBalanceHistory(site, history) {
         openBalanceHistory(site, history);
     }
 }
-
 
 function updateBalance(site, balanceData) {
     const balances = loadBalances();
@@ -274,7 +293,6 @@ function updateBalance(site, balanceData) {
     saveBalances(balances);
     renderBalances(balances);
 }
-
 
 function renderBalances(balances) {
     const cards = document.querySelectorAll('.card');

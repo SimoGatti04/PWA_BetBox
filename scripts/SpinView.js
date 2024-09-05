@@ -2,6 +2,7 @@ import { createSpinBox } from './SpinBox.js';
 import { createBonusLogModal } from './BonusLogModal.js';
 
 let bonusHistory = loadSpinHistory(); // Carica la cronologia dei bonus dal localStorage
+let isFetching = false; // Variabile di stato per tenere traccia delle richieste in corso
 
 export function createSpinView() {
   const view = document.createElement('div');
@@ -47,6 +48,13 @@ function loadSpinHistory() {
 }
 
 async function fetchSpinHistory() {
+  if (isFetching) {
+    console.log('Richiesta già in corso, evitando duplicati.');
+    return;
+  }
+
+  isFetching = true; // Imposta lo stato a true per indicare che una richiesta è in corso
+
   const sites = ['goldbet', 'lottomatica', 'snai'];
   for (const site of sites) {
     try {
@@ -63,9 +71,18 @@ async function fetchSpinHistory() {
     }
   }
   saveSpinHistory(bonusHistory); // Salva la cronologia dei bonus nel localStorage
+
+  isFetching = false; // Reimposta lo stato a false dopo che la richiesta è completata
 }
 
 function performSpin(site) {
+  if (isFetching) {
+    console.log(`Richiesta per il sito ${site} già in corso, evitando duplicati.`);
+    return;
+  }
+
+  isFetching = true; // Imposta lo stato a true per indicare che una richiesta è in corso
+
   fetch(`https://legally-modest-joey.ngrok-free.app/spin/${site}`, {
     method: 'POST',
     headers: {
@@ -77,7 +94,10 @@ function performSpin(site) {
       console.log(`Spin result for ${site}:`, result);
       fetchSpinHistory().catch(error => console.error('Error fetching spin history:', error));
     })
-    .catch(error => console.error(`Error performing spin for ${site}:`, error));
+    .catch(error => console.error(`Error performing spin for ${site}:`, error))
+    .finally(() => {
+      isFetching = false; // Reimposta lo stato a false dopo che la richiesta è completata
+    });
 }
 
 function updateSpinBox(site, spinHistory) {
@@ -98,7 +118,6 @@ function updateSpinBox(site, spinHistory) {
     }
   }
 }
-
 
 function openBonusLog(site) {
   console.log(`Opening bonus log for site: ${site}`);
