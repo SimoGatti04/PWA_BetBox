@@ -1,5 +1,6 @@
 import { siteImages } from './siteImages.js';
 
+
 async function loadLocalBetsData() {
     const response = await fetch('../../betboxscrapernodejs/activeBets/lottomaticaActiveBets.json');
     return await response.json();
@@ -118,9 +119,37 @@ function createBetPreview(site, bet) {
 
 
 
-function showBetDetails(bet) {
+
+async function showBetDetails(bet) {
     const detailView = document.createElement('div');
     detailView.className = 'bet-detail-view';
+
+    const eventPromises = bet.events.map(async event => {
+        let matchDetails = '';
+        if (event.competition.startsWith('Calcio - ')) {
+            const competitionCode = getCompetitionCode(event.competition.replace('Calcio - ', ''));
+            if (competitionCode) {
+                const [homeTeam, awayTeam] = event.name.split(' - ');
+                const date = new Date(event.date).toISOString().split('T')[0];
+                matchDetails = await fetchMatchDetails(competitionCode, date, homeTeam, awayTeam);
+            }
+        }
+
+        return `
+            <li class="event-item">
+                <div class="event-details">
+                    <p class="event-name"><strong>${event.name}</strong></p>
+                    <p class="event-date">${formatDate(event.date)}</p>
+                    <p>${event.marketType}: ${event.selection}</p>
+                    ${matchDetails ? `<p class="match-details">${matchDetails}</p>` : ''}
+                </div>
+                <div class="event-odds" style="color: ${getStatusColorSolid(event.result)}">${event.odds}</div>
+            </li>
+        `;
+    });
+
+    const eventListItems = await Promise.all(eventPromises);
+
     detailView.innerHTML = `
         <div class="bet-detail-header">
             <h2>Dettagli Scommessa</h2>
@@ -135,16 +164,7 @@ function showBetDetails(bet) {
             </div>
             <h3>Eventi:</h3>
             <ul class="event-list">
-                ${bet.events.map(event => `
-                    <li class="event-item">
-                        <div class="event-details">
-                            <p class="event-name"><strong>${event.name}</strong></p>
-                            <p class="event-date">${formatDate(event.date)}</p>
-                            <p>${event.marketType}: ${event.selection}</p>
-                        </div>
-                        <div class="event-odds" style="color: ${getStatusColorSolid(event.result)}">${event.odds}</div>
-                    </li>
-                `).join('')}
+                ${eventListItems.join('')}
             </ul>
         </div>
     `;
@@ -247,3 +267,92 @@ function formatDate(timestamp) {
         minute: '2-digit'
     });
 }
+
+async function fetchMatchDetails(competitionCode, timestamp, homeTeam, awayTeam) {
+    const date = new Date(timestamp).toISOString().split('T')[0];
+    console.log(`Preparing request for date: ${date}, competition: ${competitionCode}`);
+    console.log(`Teams: ${homeTeam} vs ${awayTeam}`);
+
+    const apiKey = '5870ff44667a451998e49aa8e5b37296';
+    const url = `https://api.football-data.org/v4/competitions/${competitionCode}/matches?dateFrom=${date}&dateTo=${date}`;
+    console.log(`Request URL: ${url}`);
+
+    try {
+        console.log('Sending API request...');
+        const response = await fetch(url, {
+            headers: { 'X-Auth-Token': apiKey }
+        });
+        console.log(`Response status: ${response.status}`);
+        const data = await response.json();
+        console.log('Response data:', JSON.stringify(data, null, 2));
+
+        if (data.matches && Array.isArray(data.matches)) {
+            console.log(`Found ${data.matches.length} matches`);
+            const match = data.matches.find(m =>
+                m.homeTeam.name.includes(homeTeam) && m.awayTeam.name.includes(awayTeam)
+            );
+
+            if (match) {
+                console.log('Match found:', JSON.stringify(match, null, 2));
+                return `Status: ${match.status}, Score: ${match.score.fullTime.home} - ${match.score.fullTime.away}`;
+            } else {
+                console.log('No matching game found for the specified teams');
+            }
+        } else {
+            console.log('No matches array in the response or it is empty');
+        }
+        return '';
+    } catch (error) {
+        console.error('Error fetching match details:', error);
+        return '';
+    }
+}
+
+export function getCompetitionCode(competitionName) {
+    const competitionCodes = {
+        'FIFA World Cup': 'WC',
+        'UEFA Champions League': 'CL',
+        'Bundesliga': 'BL1',
+        'Eredivisie': 'DED',
+        'Campeonato Brasileiro Serie A': 'BSA',
+        'Primera Division': 'PD',
+        'Ligue 1': 'FL1',
+        'Championship': 'ELC',
+        'Primeira Liga': 'PPL',
+        'European Championship': 'EC',
+        'Serie A': 'SA',
+        'Premier League': 'PL',
+        'Copa Libertadores': 'CLI'
+    };
+
+    return competitionCodes[competitionName] || null;
+}
+
+function testBetDetails() {
+    const testBet = {
+        importoGiocato: "1,00 €",
+        quotaTotale: "15.88",
+        vincitaPotenziale: "15,88 €",
+        esitoTotale: "In corso",
+        events: [
+            {
+                date: 1725043500000,
+                competition: "Calcio - Serie A",
+                name: "Inter - Atalanta",
+                marketType: "Esito Finale 1X2",
+                selection: "1",
+                odds: "1.75",
+                result: "In corso"
+            }
+        ]
+    };
+
+    showBetDetails(testBet);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    createActiveBetsView();
+    testBetDetails();
+});
+
+
