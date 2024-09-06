@@ -108,15 +108,15 @@ function createBetPreview(site, bet) {
     preview.innerHTML = `
         <img src="${siteImages[site.toLowerCase()]}" alt="${site} logo" class="site-logo">
         <div class="bet-info">
+            <p class="potential-win">${bet.vincitaPotenziale}</p>
             <p class="bet-amount">${bet.importoGiocato}@${bet.quotaTotale}</p>
-            <p class="potential-win" style="color: ${getStatusColorSolid(bet.esitoTotale)}">
-                ${bet.vincitaPotenziale}
-            </p>
         </div>
     `;
     preview.addEventListener('click', () => showBetDetails(bet));
     return preview;
 }
+
+
 
 function showBetDetails(bet) {
     const detailView = document.createElement('div');
@@ -129,7 +129,9 @@ function showBetDetails(bet) {
         <div class="bet-detail-content">
             <div class="bet-summary">
                 <span class="bet-stake-odds">${bet.importoGiocato}@${bet.quotaTotale}</span>
-                <span class="bet-potential-win">${bet.vincitaPotenziale}</span>
+                <span class="bet-potential-win" style="color: ${getStatusColorSolid(bet.esitoTotale)}">
+                    ${bet.vincitaPotenziale}
+                </span>
             </div>
             <h3>Eventi:</h3>
             <ul class="event-list">
@@ -174,9 +176,9 @@ function getStatusColorSolid(status) {
     switch (status.toLowerCase()) {
         case 'in corso':
             return 'rgb(128, 128, 0)'; // Solid Yellow
-        case 'perso':
+        case 'perdente':
             return 'rgb(128, 0, 0)'; // Solid Red
-        case 'vinto':
+        case 'vincente':
             return 'rgb(0, 128, 0)'; // Solid Green
         default:
             return 'rgb(128, 128, 128)'; // Solid Grey for unknown status

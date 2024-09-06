@@ -58,8 +58,15 @@
     flex-grow: 1;
 }
 
-.bet-amount, .potential-win, .bet-status {
+.bet-amount, .bet-status {
     margin: 5px 0;
+    font-weight: normal;
+    color: #888;
+}
+
+.potential-win{
+    margin: 5px 0;
+    font-weight: bold;
 }
 
 .bet-detail-view {
