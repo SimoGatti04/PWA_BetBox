@@ -127,6 +127,7 @@
 .event-odds {
     margin-left: 10px;
     align-self: center;
+    font-weight: bold;
 }
 
 .event-name {

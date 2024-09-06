@@ -175,15 +175,15 @@ function getStatusColor(status) {
 function getStatusColorSolid(status) {
     switch (status.toLowerCase()) {
         case 'in corso':
-            return 'rgb(128, 128, 0)'; // Solid Yellow
+            return 'rgb(150, 150, 0)'; // Solid Yellow
         case 'perdente':
         case 'perso':
-            return 'rgb(128, 0, 0)'; // Solid Red
+            return 'rgb(150, 0, 0)'; // Solid Red
         case 'vincente':
         case 'vinto':
-            return 'rgb(0, 128, 0)'; // Solid Green
+            return 'rgb(0, 150, 0)'; // Solid Green
         default:
-            return 'rgb(128, 128, 128)'; // Solid Grey for unknown status
+            return 'rgb(150, 150, 150)'; // Solid Grey for unknown status
     }
 }
 
