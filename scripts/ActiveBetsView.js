@@ -1,39 +1,27 @@
 import { siteImages } from './siteImages.js';
-
-
 async function loadLocalBetsData() {
     const response = await fetch('../../betboxscrapernodejs/activeBets/lottomaticaActiveBets.json');
     return await response.json();
 }
-
 export function createActiveBetsView() {
     const view = document.createElement('div');
     view.className = 'active-bets-view';
-
     const header = createHeader();
     const betList = createBetList();
-
     view.appendChild(header);
     view.appendChild(betList);
-
     loadActiveBets(betList);
-
     return view;
 }
-
 function createHeader() {
     const header = document.createElement('div');
     header.className = 'active-bets-header';
-
     const fetchButton = createButton('fetch-bets-button', 'fa-play', fetchActiveBets);
     const refreshButton = createButton('refresh-bets-button', 'fa-sync-alt', refreshAllBets);
-
     header.appendChild(fetchButton);
     header.appendChild(refreshButton);
-
     return header;
 }
-
 function createButton(id, iconClass, onClick) {
     const button = document.createElement('button');
     button.id = id;
@@ -43,20 +31,17 @@ function createButton(id, iconClass, onClick) {
     button.addEventListener('click', onClick);
     return button;
 }
-
 function createBetList() {
     const betList = document.createElement('div');
     betList.className = 'bet-list';
     return betList;
 }
-
 async function loadActiveBets(container) {
     try {
         const savedBets = loadBetsFromLocalStorage();
         if (Object.keys(savedBets).length > 0) {
             renderBetList(savedBets, container);
         }
-
         let bets;
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             // Use local JSON file for testing
@@ -73,7 +58,6 @@ async function loadActiveBets(container) {
             });
             bets = await response.json();
         }
-
         saveBetsToLocalStorage(bets);
         renderBetList(bets, container);
     } catch (error) {
@@ -82,9 +66,6 @@ async function loadActiveBets(container) {
         renderBetList(savedBets, container);
     }
 }
-
-
-
 function renderBetList(bets, container) {
     container.innerHTML = '';
     let hasBets = false;
@@ -101,7 +82,6 @@ function renderBetList(bets, container) {
         showNoBetsMessage(container);
     }
 }
-
 function createBetPreview(site, bet) {
     const preview = document.createElement('div');
     preview.className = 'bet-preview';
@@ -116,40 +96,9 @@ function createBetPreview(site, bet) {
     preview.addEventListener('click', () => showBetDetails(bet));
     return preview;
 }
-
-
-
-
-async function showBetDetails(bet) {
+function showBetDetails(bet) {
     const detailView = document.createElement('div');
     detailView.className = 'bet-detail-view';
-
-    const eventPromises = bet.events.map(async event => {
-        let matchDetails = '';
-        if (event.competition.startsWith('Calcio - ')) {
-            const competitionCode = getCompetitionCode(event.competition.replace('Calcio - ', ''));
-            if (competitionCode) {
-                const [homeTeam, awayTeam] = event.name.split(' - ');
-                const date = new Date(event.date).toISOString().split('T')[0];
-                matchDetails = await fetchMatchDetails(competitionCode, date, homeTeam, awayTeam);
-            }
-        }
-
-        return `
-            <li class="event-item">
-                <div class="event-details">
-                    <p class="event-name"><strong>${event.name}</strong></p>
-                    <p class="event-date">${formatDate(event.date)}</p>
-                    <p>${event.marketType}: ${event.selection}</p>
-                    ${matchDetails ? `<p class="match-details">${matchDetails}</p>` : ''}
-                </div>
-                <div class="event-odds" style="color: ${getStatusColorSolid(event.result)}">${event.odds}</div>
-            </li>
-        `;
-    });
-
-    const eventListItems = await Promise.all(eventPromises);
-
     detailView.innerHTML = `
         <div class="bet-detail-header">
             <h2>Dettagli Scommessa</h2>
@@ -164,19 +113,25 @@ async function showBetDetails(bet) {
             </div>
             <h3>Eventi:</h3>
             <ul class="event-list">
-                ${eventListItems.join('')}
+                ${bet.events.map(event => `
+                    <li class="event-item">
+                        <div class="event-details">
+                            <p class="event-name"><strong>${event.name}</strong></p>
+                            <p class="event-date">${formatDate(event.date)}</p>
+                            <p>${event.marketType}: ${event.selection}</p>
+                        </div>
+                        <div class="event-odds" style="color: ${getStatusColorSolid(event.result)}">${event.odds}</div>
+                    </li>
+                `).join('')}
             </ul>
         </div>
     `;
-
     const closeButton = detailView.querySelector('.close-button');
     closeButton.addEventListener('click', () => {
         document.body.removeChild(detailView);
     });
-
     document.body.appendChild(detailView);
 }
-
 function getStatusColor(status) {
     switch (status.toLowerCase()) {
         case 'in corso':
@@ -191,7 +146,6 @@ function getStatusColor(status) {
             return 'rgba(128, 128, 128, 0.35)'; // Grey with opacity for unknown status
     }
 }
-
 function getStatusColorSolid(status) {
     switch (status.toLowerCase()) {
         case 'in corso':
@@ -224,7 +178,6 @@ async function fetchActiveBets() {
         console.error('Errore nel recupero delle scommesse attive:', error);
     }
 }
-
 async function refreshAllBets() {
     try {
         const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets', {
@@ -241,23 +194,19 @@ async function refreshAllBets() {
         console.error('Errore nel refresh delle scommesse:', error);
     }
 }
-
 function showNoBetsMessage(container) {
     const message = document.createElement('div');
     message.className = 'no-bets-message';
     message.textContent = 'Nessuna scommessa attiva';
     container.appendChild(message);
 }
-
 function saveBetsToLocalStorage(bets) {
     localStorage.setItem('activeBets', JSON.stringify(bets));
 }
-
 function loadBetsFromLocalStorage() {
     const savedBets = localStorage.getItem('activeBets');
     return savedBets ? JSON.parse(savedBets) : {};
 }
-
 function formatDate(timestamp) {
     const date = new Date(parseInt(timestamp));
     return date.toLocaleString('it-IT', {
@@ -267,92 +216,3 @@ function formatDate(timestamp) {
         minute: '2-digit'
     });
 }
-
-async function fetchMatchDetails(competitionCode, timestamp, homeTeam, awayTeam) {
-    const date = new Date(timestamp).toISOString().split('T')[0];
-    console.log(`Preparing request for date: ${date}, competition: ${competitionCode}`);
-    console.log(`Teams: ${homeTeam} vs ${awayTeam}`);
-
-    const apiKey = '5870ff44667a451998e49aa8e5b37296';
-    const url = `https://api.football-data.org/v4/competitions/${competitionCode}/matches?dateFrom=${date}&dateTo=${date}`;
-    console.log(`Request URL: ${url}`);
-
-    try {
-        console.log('Sending API request...');
-        const response = await fetch(url, {
-            headers: { 'X-Auth-Token': apiKey }
-        });
-        console.log(`Response status: ${response.status}`);
-        const data = await response.json();
-        console.log('Response data:', JSON.stringify(data, null, 2));
-
-        if (data.matches && Array.isArray(data.matches)) {
-            console.log(`Found ${data.matches.length} matches`);
-            const match = data.matches.find(m =>
-                m.homeTeam.name.includes(homeTeam) && m.awayTeam.name.includes(awayTeam)
-            );
-
-            if (match) {
-                console.log('Match found:', JSON.stringify(match, null, 2));
-                return `Status: ${match.status}, Score: ${match.score.fullTime.home} - ${match.score.fullTime.away}`;
-            } else {
-                console.log('No matching game found for the specified teams');
-            }
-        } else {
-            console.log('No matches array in the response or it is empty');
-        }
-        return '';
-    } catch (error) {
-        console.error('Error fetching match details:', error);
-        return '';
-    }
-}
-
-export function getCompetitionCode(competitionName) {
-    const competitionCodes = {
-        'FIFA World Cup': 'WC',
-        'UEFA Champions League': 'CL',
-        'Bundesliga': 'BL1',
-        'Eredivisie': 'DED',
-        'Campeonato Brasileiro Serie A': 'BSA',
-        'Primera Division': 'PD',
-        'Ligue 1': 'FL1',
-        'Championship': 'ELC',
-        'Primeira Liga': 'PPL',
-        'European Championship': 'EC',
-        'Serie A': 'SA',
-        'Premier League': 'PL',
-        'Copa Libertadores': 'CLI'
-    };
-
-    return competitionCodes[competitionName] || null;
-}
-
-function testBetDetails() {
-    const testBet = {
-        importoGiocato: "1,00 €",
-        quotaTotale: "15.88",
-        vincitaPotenziale: "15,88 €",
-        esitoTotale: "In corso",
-        events: [
-            {
-                date: 1725043500000,
-                competition: "Calcio - Serie A",
-                name: "Inter - Atalanta",
-                marketType: "Esito Finale 1X2",
-                selection: "1",
-                odds: "1.75",
-                result: "In corso"
-            }
-        ]
-    };
-
-    showBetDetails(testBet);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    createActiveBetsView();
-    testBetDetails();
-});
-
-
