@@ -48,7 +48,13 @@ async function loadActiveBets(container) {
         if (Object.keys(savedBets).length > 0) {
             renderBetList(savedBets, container);
         }
-        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets');
+        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'ngrok-skip-browser-warning': '69420'
+            }
+        });
         const bets = await response.json();
         saveBetsToLocalStorage(bets);
         renderBetList(bets, container);
@@ -121,7 +127,13 @@ function showBetDetails(bet) {
 }
 async function fetchActiveBets() {
     try {
-        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/fetch-active-bets', { method: 'POST' });
+        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/fetch-active-bets', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'ngrok-skip-browser-warning': '69420'
+            }
+        });
         const result = await response.json();
         console.log('Scommesse attive recuperate:', result);
         const betList = document.querySelector('.bet-list');
@@ -133,7 +145,13 @@ async function fetchActiveBets() {
 
 async function refreshAllBets() {
     try {
-        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets');
+        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets',{
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'ngrok-skip-browser-warning': '69420'
+            }
+        });
         const bets = await response.json();
         const betList = document.querySelector('.bet-list');
         renderBetList(bets, betList);
