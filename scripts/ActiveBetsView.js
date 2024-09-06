@@ -1,3 +1,5 @@
+import { siteImages } from './siteImages.js';
+
 export function createActiveBetsView() {
     const view = document.createElement('div');
     view.className = 'active-bets-view';
@@ -86,10 +88,12 @@ function createBetPreview(site, bet) {
     const preview = document.createElement('div');
     preview.className = 'bet-preview';
     preview.innerHTML = `
-        <img src="images/${site.toLowerCase()}-logo.png" alt="${site} logo">
-        <p>Importo: ${bet.importoGiocato}</p>
-        <p>Vincita potenziale: ${bet.vincitaPotenziale}</p>
-        <p>Stato: ${bet.esitoTotale}</p>
+        <img src="${siteImages[site.toLowerCase()]}" alt="${site} logo" class="site-logo">
+        <div class="bet-info">
+            <p class="bet-amount">Importo: ${bet.importoGiocato}</p>
+            <p class="potential-win">Vincita potenziale: ${bet.vincitaPotenziale}</p>
+            <p class="bet-status">Stato: ${bet.esitoTotale}</p>
+        </div>
     `;
     preview.addEventListener('click', () => showBetDetails(bet));
     return preview;
@@ -99,32 +103,38 @@ function showBetDetails(bet) {
     const detailView = document.createElement('div');
     detailView.className = 'bet-detail-view';
     detailView.innerHTML = `
-        <h2>Dettagli Scommessa</h2>
-        <p>Importo giocato: ${bet.importoGiocato}</p>
-        <p>Quota totale: ${bet.quotaTotale}</p>
-        <p>Vincita potenziale: ${bet.vincitaPotenziale}</p>
-        <p>Esito totale: ${bet.esitoTotale}</p>
-        <h3>Eventi:</h3>
-        <ul>
-            ${bet.events.map(event => `
-                <li>
-                    <p>${event.name} - ${event.date}</p>
-                    <p>Mercato: ${event.marketType}</p>
-                    <p>Selezione: ${event.selection}</p>
-                    <p>Quota: ${event.odds}</p>
-                    <p>Stato: ${event.result}</p>
-                </li>
-            `).join('')}
-        </ul>
+        <div class="bet-detail-header">
+            <h2>Dettagli Scommessa</h2>
+            <button class="close-button">×</button>
+        </div>
+        <div class="bet-detail-content">
+            <p><strong>Importo giocato:</strong> ${bet.importoGiocato}</p>
+            <p><strong>Quota totale:</strong> ${bet.quotaTotale}</p>
+            <p><strong>Vincita potenziale:</strong> ${bet.vincitaPotenziale}</p>
+            <p><strong>Esito totale:</strong> ${bet.esitoTotale}</p>
+            <h3>Eventi:</h3>
+            <ul class="event-list">
+                ${bet.events.map(event => `
+                    <li class="event-item">
+                        <p><strong>${event.name}</strong> - ${event.date}</p>
+                        <p>Mercato: ${event.marketType}</p>
+                        <p>Selezione: ${event.selection}</p>
+                        <p>Quota: ${event.odds}</p>
+                        <p>Stato: ${event.result}</p>
+                    </li>
+                `).join('')}
+            </ul>
+        </div>
     `;
 
-    const container = document.querySelector('.active-bets-view');
-    const existingDetailView = container.querySelector('.bet-detail-view');
-    if (existingDetailView) {
-        container.removeChild(existingDetailView);
-    }
-    container.appendChild(detailView);
+    const closeButton = detailView.querySelector('.close-button');
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(detailView);
+    });
+
+    document.body.appendChild(detailView);
 }
+
 async function fetchActiveBets() {
     try {
         const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/fetch-active-bets', {
@@ -145,7 +155,7 @@ async function fetchActiveBets() {
 
 async function refreshAllBets() {
     try {
-        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets',{
+        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -175,6 +185,3 @@ function loadBetsFromLocalStorage() {
     const savedBets = localStorage.getItem('activeBets');
     return savedBets ? JSON.parse(savedBets) : {};
 }
-
-
-
