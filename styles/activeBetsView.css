@@ -34,12 +34,14 @@
 .bet-preview {
     display: flex;
     align-items: center;
-    background-color: #f0f0f0;
-    border-radius: 8px;
+    background-color: #1c1c1e;
+    border-radius: 15px;
     padding: 10px;
     margin-bottom: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
 }
 
 .bet-preview:hover {
@@ -89,7 +91,7 @@
 }
 
 .bet-detail-content {
-    background-color: white;
+    background-color: #1c1c1e;
     padding: 20px;
     border-radius: 8px;
 }
@@ -101,11 +103,48 @@
 
 .event-item {
     border-bottom: 1px solid #e0e0e0;
-    padding: 10px 0;
+    padding: 0.05rem 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .event-item:last-child {
     border-bottom: none;
 }
 
+.event-details {
+    flex-grow: 1;
+}
 
+.event-odds {
+    margin-left: 10px;
+    align-self: center;
+}
+
+.event-name {
+    margin-bottom: 2px;
+}
+
+.event-date {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: white;
+}
+
+.bet-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.bet-stake-odds {
+    font-weight: bold;
+}
+
+.bet-potential-win {
+    font-weight: bold;
+    color: #4CAF50;
+}

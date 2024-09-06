@@ -1,5 +1,10 @@
 import { siteImages } from './siteImages.js';
 
+async function loadLocalBetsData() {
+    const response = await fetch('../../betboxscrapernodejs/activeBets/lottomaticaActiveBets.json');
+    return await response.json();
+}
+
 export function createActiveBetsView() {
     const view = document.createElement('div');
     view.className = 'active-bets-view';
@@ -50,14 +55,24 @@ async function loadActiveBets(container) {
         if (Object.keys(savedBets).length > 0) {
             renderBetList(savedBets, container);
         }
-        const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets', {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'ngrok-skip-browser-warning': '69420'
-            }
-        });
-        const bets = await response.json();
+
+        let bets;
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Use local JSON file for testing
+            const localData = await loadLocalBetsData();
+            bets = { lottomatica: localData };
+        } else {
+            // Fetch from server in production
+            const response = await fetch('https://legally-modest-joey.ngrok-free.app/bets/all-active-bets', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'ngrok-skip-browser-warning': '69420'
+                }
+            });
+            bets = await response.json();
+        }
+
         saveBetsToLocalStorage(bets);
         renderBetList(bets, container);
     } catch (error) {
@@ -66,6 +81,8 @@ async function loadActiveBets(container) {
         renderBetList(savedBets, container);
     }
 }
+
+
 
 function renderBetList(bets, container) {
     container.innerHTML = '';
@@ -87,12 +104,14 @@ function renderBetList(bets, container) {
 function createBetPreview(site, bet) {
     const preview = document.createElement('div');
     preview.className = 'bet-preview';
+    preview.style.backgroundColor = getStatusColor(bet.esitoTotale);
     preview.innerHTML = `
         <img src="${siteImages[site.toLowerCase()]}" alt="${site} logo" class="site-logo">
         <div class="bet-info">
-            <p class="bet-amount">Importo: ${bet.importoGiocato}</p>
-            <p class="potential-win">Vincita potenziale: ${bet.vincitaPotenziale}</p>
-            <p class="bet-status">Stato: ${bet.esitoTotale}</p>
+            <p class="bet-amount">${bet.importoGiocato}@${bet.quotaTotale}</p>
+            <p class="potential-win" style="color: ${getStatusColorSolid(bet.esitoTotale)}">
+                ${bet.vincitaPotenziale}
+            </p>
         </div>
     `;
     preview.addEventListener('click', () => showBetDetails(bet));
@@ -108,19 +127,20 @@ function showBetDetails(bet) {
             <button class="close-button">×</button>
         </div>
         <div class="bet-detail-content">
-            <p><strong>Importo giocato:</strong> ${bet.importoGiocato}</p>
-            <p><strong>Quota totale:</strong> ${bet.quotaTotale}</p>
-            <p><strong>Vincita potenziale:</strong> ${bet.vincitaPotenziale}</p>
-            <p><strong>Esito totale:</strong> ${bet.esitoTotale}</p>
+            <div class="bet-summary">
+                <span class="bet-stake-odds">${bet.importoGiocato}@${bet.quotaTotale}</span>
+                <span class="bet-potential-win">${bet.vincitaPotenziale}</span>
+            </div>
             <h3>Eventi:</h3>
             <ul class="event-list">
                 ${bet.events.map(event => `
-                    <li class="event-item">
-                        <p><strong>${event.name}</strong> - ${event.date}</p>
-                        <p>Mercato: ${event.marketType}</p>
-                        <p>Selezione: ${event.selection}</p>
-                        <p>Quota: ${event.odds}</p>
-                        <p>Stato: ${event.result}</p>
+                    <li class="event-item" style="background-color: ${getStatusColor(event.result)}">
+                        <div class="event-details">
+                            <p class="event-name"><strong>${event.name}</strong></p>
+                            <p class="event-date">${formatDate(event.date)}</p>
+                            <p>${event.marketType}: ${event.selection}</p>
+                        </div>
+                        <div class="event-odds">${event.odds}</div>
                     </li>
                 `).join('')}
             </ul>
@@ -133,6 +153,34 @@ function showBetDetails(bet) {
     });
 
     document.body.appendChild(detailView);
+}
+
+function getStatusColor(status) {
+    switch (status.toLowerCase()) {
+        case 'in corso':
+            return 'rgba(128, 128, 0, 0.35)'; // Yellow with opacity
+        case 'perdente':
+        case 'perso':
+            return 'rgba(128, 0, 0, 0.35)'; // Red with opacity
+        case 'vincente':
+        case 'vinto':
+            return 'rgba(0, 128, 0, 0.35)'; // Green with opacity
+        default:
+            return 'rgba(128, 128, 128, 0.35)'; // Grey with opacity for unknown status
+    }
+}
+
+function getStatusColorSolid(status) {
+    switch (status.toLowerCase()) {
+        case 'in corso':
+            return 'rgb(128, 128, 0)'; // Solid Yellow
+        case 'perso':
+            return 'rgb(128, 0, 0)'; // Solid Red
+        case 'vinto':
+            return 'rgb(0, 128, 0)'; // Solid Green
+        default:
+            return 'rgb(128, 128, 128)'; // Solid Grey for unknown status
+    }
 }
 
 async function fetchActiveBets() {
@@ -184,4 +232,14 @@ function saveBetsToLocalStorage(bets) {
 function loadBetsFromLocalStorage() {
     const savedBets = localStorage.getItem('activeBets');
     return savedBets ? JSON.parse(savedBets) : {};
+}
+
+function formatDate(timestamp) {
+    const date = new Date(parseInt(timestamp));
+    return date.toLocaleString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
