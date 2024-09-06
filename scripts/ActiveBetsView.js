@@ -136,13 +136,13 @@ function showBetDetails(bet) {
             <h3>Eventi:</h3>
             <ul class="event-list">
                 ${bet.events.map(event => `
-                    <li class="event-item" style="background-color: ${getStatusColor(event.result)}">
+                    <li class="event-item">
                         <div class="event-details">
                             <p class="event-name"><strong>${event.name}</strong></p>
                             <p class="event-date">${formatDate(event.date)}</p>
                             <p>${event.marketType}: ${event.selection}</p>
                         </div>
-                        <div class="event-odds">${event.odds}</div>
+                        <div class="event-odds" style="color: ${getStatusColorSolid(event.result)}">${event.odds}</div>
                     </li>
                 `).join('')}
             </ul>
@@ -177,8 +177,10 @@ function getStatusColorSolid(status) {
         case 'in corso':
             return 'rgb(128, 128, 0)'; // Solid Yellow
         case 'perdente':
+        case 'perso':
             return 'rgb(128, 0, 0)'; // Solid Red
         case 'vincente':
+        case 'vinto':
             return 'rgb(0, 128, 0)'; // Solid Green
         default:
             return 'rgb(128, 128, 128)'; // Solid Grey for unknown status
