@@ -1,5 +1,7 @@
 import { createBalanceView, fetchAllRecentBalances } from './BalanceView.js';
 import { createSpinView } from './SpinView.js';
+import { createActiveBetsView } from './ActiveBetsView.js';
+
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.getElementById('root');
@@ -14,12 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function createNavigation() {
-  const nav = document.createElement('nav');
-  const balanceLink = createNavLink('Saldi', 'fa-wallet', showBalanceView);
-  const spinLink = createNavLink('Spin', 'fa-sync', showSpinView);
-  nav.appendChild(balanceLink);
-  nav.appendChild(spinLink);
-  return nav;
+    const nav = document.createElement('nav');
+    const balanceLink = createNavLink('Saldi', 'fa-wallet', showBalanceView);
+    const spinLink = createNavLink('Spin', 'fa-sync', showSpinView);
+    const activeBetsLink = createNavLink('Scommesse', 'fa-ticket-alt', showActiveBetsView);
+    nav.appendChild(balanceLink);
+    nav.appendChild(spinLink);
+    nav.appendChild(activeBetsLink);
+    return nav;
 }
 
 function createNavLink(text, iconClass, onClick) {
@@ -66,4 +70,11 @@ function updateHeaderTitle(title) {
     h1.textContent = title;
     header.appendChild(h1);
   }
+}
+
+function showActiveBetsView() {
+    updateHeaderTitle('Bets');
+    const contentContainer = document.querySelector('main#content');
+    contentContainer.innerHTML = '';
+    contentContainer.appendChild(createActiveBetsView());
 }

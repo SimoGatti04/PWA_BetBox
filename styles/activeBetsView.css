@@ -1,0 +1,33 @@
+#fetch-bets-button{
+    position: absolute;
+    background: none;
+    border: none;
+    color: #0a84ff;
+    font-size: 2rem;
+    cursor: pointer;
+    right:6rem;
+    top:1.5rem;
+}
+
+#refresh-bets-button {
+    position: absolute;
+    background: none;
+    border: none;
+    color: #0a84ff;
+    font-size: 2rem;
+    cursor: pointer;
+    right: 1.5rem;
+    top: 1.5rem;
+}
+
+.no-bets-message {
+    text-align: center;
+    color: #888;
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    position: absolute;
+    top: 25rem;
+    left: 5rem;
+    opacity: 0.5;
+}
+
