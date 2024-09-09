@@ -19,12 +19,21 @@ export function createSpinView() {
   let shouldFetch = false;
 
   sites.forEach(site => {
-    const lastBonus = bonusHistory[site] && bonusHistory[site].find(bonus => bonus.date.split('T')[0] === today);
-    if (!lastBonus || lastBonus.result.tipo === 'N/A') {
+    const lastBonus = bonusHistory[site] && bonusHistory[site].find(bonus => {
+      if(bonus.result!=null){
+        const isToday = bonus.date.split('T')[0] === today;
+        const isValidBonus = bonus.result.tipo !== 'Nullo' && bonus.result.tipo !== 'N/A' && bonus.result.tipo !== null;
+        return isToday && isValidBonus;
+      }
+      return false
+    });
+
+    if (!lastBonus) {
       shouldFetch = true;
     }
+
     const spinBox = createSpinBox(site, lastBonus, () => performSpin(site), () => openBonusLog(site));
-    if (lastBonus && lastBonus.result.tipo !== 'N/A') {
+    if (lastBonus) {
       spinBox.classList.add('bonus-today');
     }
     sitesContainer.appendChild(spinBox);
@@ -38,6 +47,7 @@ export function createSpinView() {
 
   return view;
 }
+
 
 function saveSpinHistory(spinHistory) {
   localStorage.setItem('spinHistory', JSON.stringify(spinHistory));
@@ -115,13 +125,15 @@ function updateSpinBox(site, spinHistory) {
       console.error(`Elemento .bonus-value non trovato per il sito ${site}`);
     }
     const today = new Date().toISOString().split('T')[0];
-    if (lastSpin.date.split('T')[0] === today && lastSpin.result && lastSpin.result.tipo !== 'Nullo') {
+    if (lastSpin.date.split('T')[0] === today && lastSpin.result &&
+        lastSpin.result.tipo !== 'Nullo' && lastSpin.result.tipo !== 'N/A' && lastSpin.result.tipo !== null) {
       spinBox.classList.add('bonus-today');
     } else {
       spinBox.classList.remove('bonus-today');
     }
   }
 }
+
 
 function openBonusLog(site) {
   console.log(`Opening bonus log for site: ${site}`);
