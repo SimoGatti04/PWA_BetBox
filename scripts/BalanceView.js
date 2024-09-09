@@ -1,4 +1,5 @@
 import { siteImages } from './siteImages.js';
+import config from "../config.js";
 
 let isFetching = false;
 
@@ -35,7 +36,7 @@ export async function fetchAllRecentBalances() {
     isFetching = true;
 
     try {
-        const response = await fetch('https://legally-modest-joey.ngrok-free.app/balance-history/recent', {
+        const response = await fetch(`${config.apiBaseUrl}/balance-history/recent`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -180,7 +181,7 @@ async function fetchBalance(site) {
 
     try {
         console.log(`Recupero saldo per il sito: ${site}`);
-        const response = await fetch(`https://legally-modest-joey.ngrok-free.app/balances/${site}`, {
+        const response = await fetch(`${config.apiBaseUrl}/balances/${site}`, {
             method: 'GET',
             headers: new Headers({
                 'Accept': 'application/json',
@@ -220,7 +221,7 @@ async function fetchBalanceHistory(site) {
     isFetching = true;
 
     try {
-        const response = await fetch(`https://legally-modest-joey.ngrok-free.app/balance-history/${site}`, {
+        const response = await fetch(`${config.apiBaseUrl}/balance-history/${site}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

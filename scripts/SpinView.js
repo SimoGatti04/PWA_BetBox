@@ -1,5 +1,6 @@
 import { createSpinBox } from './SpinBox.js';
 import { createBonusLogModal } from './BonusLogModal.js';
+import config from "../config.js";
 
 let bonusHistory = loadSpinHistory();
 let isFetching = false;
@@ -56,9 +57,9 @@ async function fetchSpinHistory() {
   const sites = ['goldbet', 'lottomatica', 'snai'];
   for (const site of sites) {
     try {
-      const response = await fetch(`https://legally-modest-joey.ngrok-free.app/spin-history/${site}`, {
+      const response = await fetch(`${config.apiBaseUrl}/spin-history/${site}`, {
         headers: {
-          'ngrok-skip-browser-warning': 'true'
+          'ngrok-skip-browser-warning': 'true',
         }
       });
       const data = await response.json();
@@ -81,7 +82,7 @@ function performSpin(site) {
 
   isFetching = true;
 
-  fetch(`https://legally-modest-joey.ngrok-free.app/spin/${site}`, {
+  fetch(`${config.apiBaseUrl}/spin/${site}`, {
     method: 'POST',
     headers: {
       'ngrok-skip-browser-warning': 'true'
