@@ -1,6 +1,7 @@
 import { siteImages } from './siteImages.js';
 import config from "../config.js";
 
+const fetchingStatus = {};
 let isFetching = false;
 
 function saveBalances(balances) {
@@ -172,12 +173,12 @@ function formatDate(dateString) {
 }
 
 async function fetchBalance(site) {
-    if (isFetching) {
+    if (fetchingStatus[site]) {
         console.log(`Richiesta per il sito ${site} già in corso, evitando duplicati.`);
         return;
     }
 
-    isFetching = true;
+    fetchingStatus[site] = true;
 
     try {
         console.log(`Recupero saldo per il sito: ${site}`);
@@ -208,7 +209,7 @@ async function fetchBalance(site) {
         console.error('Errore nel recupero del saldo:', error);
         updateBalance(site, 'Errore');
     } finally {
-        isFetching = false;
+        fetchingStatus[site] = false;
     }
 }
 

@@ -2,8 +2,10 @@ import { createSpinBox } from './SpinBox.js';
 import { createBonusLogModal } from './BonusLogModal.js';
 import config from "../config.js";
 
+// Replace the global isFetching variable with an object
+let fetchingStatus = {};
 let bonusHistory = loadSpinHistory();
-let isFetching = false;
+
 
 export function createSpinView() {
   const view = document.createElement('div');
@@ -46,16 +48,17 @@ function loadSpinHistory() {
   return spinHistory ? JSON.parse(spinHistory) : {};
 }
 
+// Modify the fetchSpinHistory function
 async function fetchSpinHistory() {
-  if (isFetching) {
-    console.log('Richiesta già in corso, evitando duplicati.');
-    return;
-  }
-
-  isFetching = true;
-
   const sites = ['goldbet', 'lottomatica', 'snai'];
   for (const site of sites) {
+    if (fetchingStatus[site]) {
+      console.log(`Richiesta per il sito ${site} già in corso, evitando duplicati.`);
+      continue;
+    }
+
+    fetchingStatus[site] = true;
+
     try {
       const response = await fetch(`${config.apiBaseUrl}/spin-history/${site}`, {
         headers: {
@@ -67,20 +70,21 @@ async function fetchSpinHistory() {
       updateSpinBox(site, data);
     } catch (error) {
       console.error(`Error fetching spin history for ${site}:`, error);
+    } finally {
+      fetchingStatus[site] = false;
     }
   }
   saveSpinHistory(bonusHistory);
-
-  isFetching = false;
 }
 
+// Modify the performSpin function
 function performSpin(site) {
-  if (isFetching) {
+  if (fetchingStatus[site]) {
     console.log(`Richiesta per il sito ${site} già in corso, evitando duplicati.`);
     return;
   }
 
-  isFetching = true;
+  fetchingStatus[site] = true;
 
   fetch(`${config.apiBaseUrl}/spin/${site}`, {
     method: 'POST',
@@ -95,9 +99,10 @@ function performSpin(site) {
     })
     .catch(error => console.error(`Error performing spin for ${site}:`, error))
     .finally(() => {
-      isFetching = false;
+      fetchingStatus[site] = false;
     });
 }
+
 
 function updateSpinBox(site, spinHistory) {
   const spinBox = document.querySelector(`.spin-box[data-site="${site}"]`);
@@ -149,9 +154,4 @@ function formatDate(dateString) {
   });
 }
 
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && isFetching) {
-    console.log('Utente uscito dall\'app. Considero la richiesta chiusa.');
-    isFetching = false;
-  }
-});
+
