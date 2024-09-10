@@ -5,7 +5,7 @@
     color: #0a84ff;
     font-size: 2rem;
     cursor: pointer;
-    right:6rem;
+    right:7.8rem;
     top:1.5rem;
 }
 
@@ -16,8 +16,39 @@
     color: #0a84ff;
     font-size: 2rem;
     cursor: pointer;
+    right: 4rem;
+    top: 1.5rem;
+}
+
+#menu-button{
+    position: absolute;
+    background: none;
+    border: none;
+    color: #0a84ff;
+    font-size: 2rem;
+    cursor: pointer;
     right: 1.5rem;
     top: 1.5rem;
+}
+
+.update-menu.overlay {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1c1c1e;
+    border: 1px solid #1c1c1e;
+    border-radius: 5px;
+    padding: 10px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.menu-item {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.menu-item:hover {
+    background-color: #f0f0f0;
 }
 
 .no-bets-message {
@@ -194,4 +225,21 @@
     width: 2.4rem;
     padding-left: 0.25rem;
     padding-right: 0.25rem;
+}
+
+
+.history-button {
+    left: 1rem;
+    position: absolute;
+    background: none;
+    border: none;
+    color: #0a84ff;
+    cursor: pointer;
+    top: 45rem;
+    width: 4rem;
+    height: 4rem;
+}
+
+.history-button i{
+    font-size: 2rem
 }

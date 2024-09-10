@@ -9,8 +9,12 @@ export function createActiveBetsView() {
     view.className = 'active-bets-view';
     const header = createHeader();
     const betList = createBetList();
+    const historyButton = createHistoryButton();
+    const menu = createMenu();
     view.appendChild(header);
+    view.appendChild(menu);
     view.appendChild(betList);
+    view.appendChild(historyButton);
 
     // Load and render saved bets immediately
     const savedBets = loadBetsFromLocalStorage();
@@ -23,39 +27,97 @@ export function createActiveBetsView() {
     return view;
 }
 
+function createHistoryButton() {
+    const historyButton = document.createElement('button');
+    historyButton.className = 'history-button';
+    historyButton.innerHTML = '<i class="fas fa-clipboard-list"></i>';
+    historyButton.addEventListener('click', showBetHistory);
+    return historyButton;
+}
+
 
 function updateMatchResultsIfNeeded(bets, betList) {
     const now = Date.now();
     const lastRequestTime = localStorage.getItem('lastResultRequestTime') || 0;
     const fiveMinutes = 5 * 60 * 1000;
 
-    const eventsToUpdate = Object.values(bets).flatMap(siteBets =>
-    siteBets.flatMap(bet => bet.events.filter(event => {
-        if (!event.matchResult || ['NOT STARTED', 'TIMED'].includes(event.matchResult.status.toUpperCase())) {
-            return now >= new Date(event.date).getTime();
-        }
-        if (['IN_PLAY', 'LIVE'].includes(event.matchResult.status.toUpperCase())) {
-            return now - lastRequestTime >= fiveMinutes;
-        }
-        return false; // Don't update finished matches
-    }))
-);
+    const eventsToUpdate = Object.values(bets).flatMap(site =>
+        Object.values(site).flatMap(bet =>
+            bet && bet.events ? bet.events.filter(event => {
+                if (!event.matchResult || ['NOT STARTED', 'TIMED'].includes(event.matchResult?.status?.toUpperCase())) {
+                    return now >= new Date(event.date).getTime();
+                }
+                if (['IN_PLAY', 'LIVE'].includes(event.matchResult?.status?.toUpperCase())) {
+                    return now - lastRequestTime >= fiveMinutes;
+                }
+                return false; // Don't update finished matches
+            }) : []
+        )
+    );
 
     if (eventsToUpdate.length > 0) {
         updateMatchResults(eventsToUpdate, bets, betList);
     }
 }
 
+function showBetHistory() {
+    const savedBets = loadBetsFromLocalStorage();
+    const historyModal = createBetHistoryModal(savedBets.history);
+    document.body.appendChild(historyModal);
+}
+
+function createBetHistoryModal(history) {
+    const modalContainer = document.createElement('div');
+    modalContainer.className = 'modal-container';
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
+    const closeButton = document.createElement('span');
+    closeButton.className = 'close-button';
+    closeButton.textContent = '×';
+    closeButton.addEventListener('click', () => modalContainer.remove());
+    modalContent.appendChild(closeButton);
+
+    const title = document.createElement('h2');
+    title.textContent = 'Cronologia scommesse';
+    modalContent.appendChild(title);
+
+    const historyList = document.createElement('ul');
+    historyList.className = 'history-list';
+
+    for (const site in history) {
+        history[site].forEach(bet => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <strong>${site}</strong>: ${bet.importoGiocato}@${bet.quotaTotale} - 
+                ${formatDate(bet.removedAt)}
+            `;
+            historyList.appendChild(listItem);
+        });
+    }
+
+    modalContent.appendChild(historyList);
+    modalContainer.appendChild(modalContent);
+
+    return modalContainer;
+}
+
 async function updateMatchResults(events, bets, betList) {
     const updatedResults = await getMatchResult(events);
 
     for (const site in bets) {
-        for (const bet of bets[site]) {
-            bet.events = bet.events.map(event => {
-                const updatedResult = updatedResults.find(r => r.name === event.name);
-                return updatedResult ? { ...event, matchResult: updatedResult } : event;
-            });
-        }
+        ['toKeep', 'toAdd'].forEach(key => {
+            if (Array.isArray(bets[site][key])) {
+                bets[site][key] = bets[site][key].map(bet => ({
+                    ...bet,
+                    events: bet.events.map(event => {
+                        const updatedResult = updatedResults.find(r => r.name === event.name);
+                        return updatedResult ? { ...event, matchResult: updatedResult } : event;
+                    })
+                }));
+            }
+        });
     }
 
     localStorage.setItem('lastResultRequestTime', Date.now().toString());
@@ -64,15 +126,20 @@ async function updateMatchResults(events, bets, betList) {
     window.dispatchEvent(new CustomEvent(BET_UPDATED_EVENT, { detail: bets }));
 }
 
+
+
 function createHeader() {
     const header = document.createElement('div');
     header.className = 'active-bets-header';
     const fetchButton = createButton('fetch-bets-button', 'fa-play', fetchActiveBets);
     const refreshButton = createButton('refresh-bets-button', 'fa-sync-alt', refreshAllBets);
+    const menuButton = createButton('menu-button', 'fa-ellipsis-v', toggleMenu);
     header.appendChild(fetchButton);
     header.appendChild(refreshButton);
+    header.appendChild(menuButton);
     return header;
 }
+
 function createButton(id, iconClass, onClick) {
     const button = document.createElement('button');
     button.id = id;
@@ -87,33 +154,118 @@ function createBetList() {
     betList.className = 'bet-list';
     return betList;
 }
+function createMenu() {
+    const sites = ['goldbet', 'bet365', 'eurobet', 'sisal', 'snai', 'lottomatica', 'cplay'];
+    const menu = document.createElement('div');
+    menu.className = 'update-menu overlay';
+    menu.style.display = 'none';
+
+    sites.forEach(site => {
+        const item = document.createElement('div');
+        item.className = 'menu-item';
+        item.textContent = `Update ${site.charAt(0).toUpperCase() + site.slice(1)}`;
+        item.addEventListener('click', () => {
+            updateSiteBets(site);
+            toggleMenu();
+        });
+        menu.appendChild(item);
+    });
+
+    return menu;
+}
+
+function toggleMenu() {
+    const menu = document.querySelector('.update-menu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+
+
 async function loadActiveBets(container) {
     try {
         const savedBets = loadBetsFromLocalStorage();
-        if (Object.keys(savedBets).length > 0) {
-            renderBetList(savedBets, container);
-        }
-        let bets;
-        // Fetch from server in production
         const response = await fetch(`${config.apiBaseUrl}/bets/all-active-bets`, {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Accept': 'application/json',
+                'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
-            }
+            },
+            body: JSON.stringify({ appBets: savedBets })
         });
-        bets = await response.json();
-        saveBetsToLocalStorage(bets);
-        renderBetList(bets, container);
+        const comparison = await response.json();
+        const updatedBets = mergeServerAndLocalBets(savedBets, comparison);
+        renderBetList(updatedBets, container);
+        saveBetsToLocalStorage(updatedBets);
+        updateMatchResultsIfNeeded(updatedBets, container);
     } catch (error) {
         console.error('Errore nel caricamento delle scommesse attive:', error);
         const savedBets = loadBetsFromLocalStorage();
         renderBetList(savedBets, container);
     }
 }
+
+function mergeServerAndLocalBets(savedBets, comparison) {
+    const updatedBets = { ...savedBets };
+    for (const site in comparison) {
+        updatedBets[site] = updatedBets[site] || {};
+        updatedBets[site].toKeep = comparison[site].toKeep.map(betId => {
+            return savedBets[site]?.toKeep?.find(bet => bet.betId === betId) || betId;
+        });
+        updatedBets[site].toAdd = comparison[site].toAdd;
+        // Rimuovi le scommesse in toRemove
+        if (updatedBets[site].toKeep) {
+            updatedBets[site].toKeep = updatedBets[site].toKeep.filter(bet =>
+                !comparison[site].toRemove.includes(bet.betId)
+            );
+        }
+    }
+    return updatedBets;
+}
+
+function processComparisonResult(comparison, savedBets) {
+    const updatedBets = { active: {}, history: savedBets.history || {} };
+    const now = Date.now();
+
+    for (const site in comparison) {
+        updatedBets.active[site] = [];
+
+        // Add new bets
+        updatedBets.active[site].push(...comparison[site].toAdd);
+
+        // Keep existing bets
+        comparison[site].toKeep.forEach(betId => {
+            const existingBet = savedBets.active[site].find(bet => bet.betId === betId);
+            if (existingBet) {
+                updatedBets.active[site].push(existingBet);
+            }
+        });
+
+        // Move removed bets to history
+        comparison[site].toRemove.forEach(betId => {
+            const removedBet = savedBets.active[site].find(bet => bet.betId === betId);
+            if (removedBet) {
+                if (!updatedBets.history[site]) {
+                    updatedBets.history[site] = [];
+                }
+                updatedBets.history[site].push({ ...removedBet, removedAt: now });
+            }
+        });
+    }
+
+    // Clean up old history entries
+    for (const site in updatedBets.history) {
+        updatedBets.history[site] = updatedBets.history[site].filter(bet =>
+            now - bet.removedAt < 7 * 24 * 60 * 60 * 1000
+        );
+    }
+
+    return updatedBets;
+}
+
 function renderBetList(bets, container) {
     container.innerHTML = '';
     let hasBets = false;
+
     Object.entries(bets).forEach(([site, siteBets]) => {
         if (siteBets.length > 0) {
             hasBets = true;
@@ -123,10 +275,13 @@ function renderBetList(bets, container) {
             });
         }
     });
+
     if (!hasBets) {
         showNoBetsMessage(container);
     }
 }
+
+
 function createBetPreview(site, bet) {
     const preview = document.createElement('div');
     preview.className = 'bet-preview';
@@ -146,24 +301,34 @@ function showBetDetails(bet) {
     const detailView = document.createElement('div');
     detailView.className = 'bet-detail-view';
 
-    function updateDetailView(updatedBets) {
+    const updateDetailView = (event) => {
+        const updatedBets = event.detail;
         const updatedBet = Object.values(updatedBets)
-            .flatMap(siteBets => siteBets)
+            .flat()
             .find(b => b.betId === bet.betId);
 
         if (updatedBet) {
             detailView.innerHTML = createBetDetailContent(updatedBet);
-            attachCloseButtonListener(detailView);
+            attachCloseButtonListener(detailView, updateDetailView);
         }
-    }
+    };
 
     detailView.innerHTML = createBetDetailContent(bet);
-    attachCloseButtonListener(detailView);
+    attachCloseButtonListener(detailView, updateDetailView);
 
-    window.addEventListener(BET_UPDATED_EVENT, (event) => updateDetailView(event.detail));
+    window.addEventListener(BET_UPDATED_EVENT, updateDetailView);
 
     document.body.appendChild(detailView);
 }
+
+function attachCloseButtonListener(detailView, updateDetailView) {
+    const closeButton = detailView.querySelector('.close-button');
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(detailView);
+        window.removeEventListener(BET_UPDATED_EVENT, updateDetailView);
+    });
+}
+
 
 function createBetDetailContent(bet) {
     const eventListItems = bet.events.map(event => {
@@ -211,15 +376,6 @@ function createBetDetailContent(bet) {
     `;
 }
 
-function attachCloseButtonListener(detailView) {
-    const closeButton = detailView.querySelector('.close-button');
-    closeButton.addEventListener('click', () => {
-        document.body.removeChild(detailView);
-        window.removeEventListener(BET_UPDATED_EVENT, updateDetailView);
-    });
-}
-
-
 function getStatusColor(status) {
     switch (status.toLowerCase()) {
         case 'in corso':
@@ -266,23 +422,95 @@ async function fetchActiveBets() {
         console.error('Errore nel recupero delle scommesse attive:', error);
     }
 }
+
 async function refreshAllBets() {
     try {
+        const savedBets = loadBetsFromLocalStorage();
         const response = await fetch(`${config.apiBaseUrl}/bets/all-active-bets`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'ngrok-skip-browser-warning': '69420'
+            },
+            body: JSON.stringify({ appBets: savedBets })
+        });
+        const comparison = await response.json();
+        const updatedBets = updateLocalBets(savedBets, comparison);
+        const betList = document.querySelector('.bet-list');
+        renderBetList(updatedBets, betList);
+        saveBetsToLocalStorage(updatedBets);
+    } catch (error) {
+        console.error('Errore nel refresh delle scommesse:', error);
+    }
+}
+
+function updateLocalBets(savedBets, comparison) {
+    const updatedBets = { ...savedBets };
+
+    for (const site in comparison) {
+        updatedBets[site] = updatedBets[site] || [];
+
+        // Add new bets from toAdd
+        updatedBets[site] = [
+            ...updatedBets[site],
+            ...comparison[site].toAdd
+        ];
+
+        // Keep only bets that are in toKeep or were just added
+        updatedBets[site] = updatedBets[site].filter(bet =>
+            comparison[site].toKeep.includes(bet.betId) ||
+            comparison[site].toAdd.some(newBet => newBet.betId === bet.betId)
+        );
+    }
+
+    return updatedBets;
+}
+
+function createUpdateMenu() {
+    const sites = ['goldbet', 'bet365', 'eurobet', 'sisal', 'snai', 'lottomatica', 'cplay'];
+    const menu = document.createElement('select');
+    menu.id = 'update-menu';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.text = 'Update Site';
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    menu.appendChild(defaultOption);
+
+    sites.forEach(site => {
+        const option = document.createElement('option');
+        option.value = site;
+        option.text = `Update ${site.charAt(0).toUpperCase() + site.slice(1)}`;
+        menu.appendChild(option);
+    });
+
+    menu.addEventListener('change', (event) => {
+        const selectedSite = event.target.value;
+        updateSiteBets(selectedSite);
+        event.target.selectedIndex = 0;
+    });
+
+    return menu;
+}
+
+async function updateSiteBets(site) {
+    try {
+        const response = await fetch(`${config.apiBaseUrl}/bets/${site}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
             }
         });
-        const bets = await response.json();
-        const betList = document.querySelector('.bet-list');
-        renderBetList(bets, betList);
-        saveBetsToLocalStorage(bets);
+        const result = await response.json();
+        console.log(`Active bets updated for ${site}:`, result);
+        loadActiveBets(document.querySelector('.bet-list'));
     } catch (error) {
-        console.error('Errore nel refresh delle scommesse:', error);
+        console.error(`Error updating active bets for ${site}:`, error);
     }
 }
+
 
 function showNoBetsMessage(container) {
     const message = document.createElement('div');
@@ -293,6 +521,7 @@ function showNoBetsMessage(container) {
 function saveBetsToLocalStorage(bets) {
     localStorage.setItem('activeBets', JSON.stringify(bets));
 }
+
 function loadBetsFromLocalStorage() {
     const savedBets = localStorage.getItem('activeBets');
     return savedBets ? JSON.parse(savedBets) : {};
