@@ -29,7 +29,7 @@ export function createActiveBetsView() {
 
 function createHistoryButton() {
     const historyButton = document.createElement('button');
-    historyButton.className = 'history-button';
+    historyButton.className = 'bet-history-button';
     historyButton.innerHTML = '<i class="fas fa-clipboard-list"></i>';
     historyButton.addEventListener('click', showBetHistory);
     return historyButton;
