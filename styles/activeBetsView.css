@@ -243,3 +243,14 @@
 .bet-history-button i{
     font-size: 2rem
 }
+
+.modal-content {
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollable-content {
+    flex-grow: 1;
+    overflow-y: auto;
+}

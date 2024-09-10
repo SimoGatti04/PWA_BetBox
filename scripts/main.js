@@ -1,6 +1,6 @@
 import { createBalanceView, fetchAllRecentBalances } from './BalanceView.js';
 import { createSpinView } from './SpinView.js';
-import { createActiveBetsView } from './ActiveBetsView.js';
+import { createActiveBetsView } from './ActiveBets/ActiveBetsView.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
