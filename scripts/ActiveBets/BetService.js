@@ -83,6 +83,9 @@ export function updateMatchResultsIfNeeded(bets, betList) {
                 if (['IN_PLAY', 'LIVE'].includes(event.matchResult?.status?.toUpperCase())) {
                     return now - lastRequestTime >= fiveMinutes;
                 }
+                if (event.matchResult === "N/A"){
+                    return true;
+                }
                 return false; // Don't update finished matches
             }) : []
         )
@@ -97,17 +100,13 @@ export async function updateMatchResults(events, bets, betList) {
     const updatedResults = await getMatchResult(events);
 
     for (const site in bets) {
-        ['toKeep', 'toAdd'].forEach(key => {
-            if (Array.isArray(bets[site][key])) {
-                bets[site][key] = bets[site][key].map(bet => ({
-                    ...bet,
-                    events: bet.events.map(event => {
-                        const updatedResult = updatedResults.find(r => r.name === event.name);
-                        return updatedResult ? { ...event, matchResult: updatedResult } : event;
-                    })
-                }));
-            }
-        });
+        bets[site] = bets[site].map(bet => ({
+            ...bet,
+            events: bet.events.map(event => {
+                const updatedResult = updatedResults.find(r => r.name === event.name);
+                return updatedResult ? { ...event, matchResult: updatedResult } : event;
+            })
+        }));
     }
 
     localStorage.setItem('lastResultRequestTime', Date.now().toString());
@@ -115,6 +114,7 @@ export async function updateMatchResults(events, bets, betList) {
     renderBetList(bets, betList);
     window.dispatchEvent(new CustomEvent(BET_UPDATED_EVENT, { detail: bets }));
 }
+
 
 export function mergeServerAndLocalBets(savedBets, comparison) {
     const updatedBets = { ...savedBets };
