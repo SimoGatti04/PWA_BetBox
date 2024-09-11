@@ -65,7 +65,8 @@
 @media (max-width: 390px) {
 
   .spin-button {
-      left: 18.3rem;
+    left: 18rem;
+    top: 1.5rem;
   }
 
   .spin-box{
