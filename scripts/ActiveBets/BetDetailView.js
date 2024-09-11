@@ -93,7 +93,6 @@ function createBetDetailContent(bet, isHistorical) {
         <div class="bet-detail-header">
             <h2 class="bet-potential-win" style="color: ${getStatusColorSolid(bet.esitoTotale)}">
                     ${bet.vincitaPotenziale}</h2>
-            <button class="close-button">×</button>
         </div>
         <div class="bet-detail-content">
             <ul class="event-list">
