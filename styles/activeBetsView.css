@@ -163,6 +163,7 @@
 
 .event-name {
     margin-bottom: 2px;
+    max-width: 15.5rem;
 }
 
 .event-date {
@@ -253,4 +254,8 @@
 .scrollable-content {
     flex-grow: 1;
     overflow-y: auto;
+}
+
+.event-selection {
+    max-width: 15.5rem;
 }
