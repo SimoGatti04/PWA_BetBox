@@ -36,31 +36,21 @@ header h1 {
     color: white;
 }
 
-.refresh-all-button {
-    background: transparent;
-    cursor: pointer;
-    font-size: 1.5em;
-    color: #0a84ff;
-    background: none;
-    border: none;
-}
-
-
 main {
     flex: 1;
     padding-bottom: 60px;
 }
 
 nav {
-  position: fixed;
-  bottom: 5px; /* Adjust this value to move the nav bar higher */
-  left: 0;
-  right: 0;
-  background-color: transparent;
-  padding: 10px 0;
-  display: flex;
-  justify-content: center;
-  z-index: 1000;
+    position: fixed;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    background-color: transparent;
+    padding: 10px 0;
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
 }
 
 nav a {

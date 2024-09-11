@@ -1,6 +1,7 @@
 import { createBalanceView, fetchAllRecentBalances } from './BalanceView.js';
 import { createSpinView } from './SpinView.js';
 import { createActiveBetsView } from './ActiveBets/ActiveBetsView.js';
+import { createLogView } from './ApiLogs/LogView.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,9 +21,11 @@ function createNavigation() {
     const balanceLink = createNavLink('Saldi', 'fa-wallet', showBalanceView);
     const spinLink = createNavLink('Spin', 'fa-sync', showSpinView);
     const activeBetsLink = createNavLink('Scommesse', 'fa-ticket-alt', showActiveBetsView);
+    const logLink = createNavLink('Log', 'fa-terminal', showLogView); // Aggiungiamo il link per i log
     nav.appendChild(balanceLink);
     nav.appendChild(spinLink);
     nav.appendChild(activeBetsLink);
+    nav.appendChild(logLink);
     return nav;
 }
 
@@ -77,4 +80,24 @@ function showActiveBetsView() {
     const contentContainer = document.querySelector('main#content');
     contentContainer.innerHTML = '';
     contentContainer.appendChild(createActiveBetsView());
+}
+
+function showLogView() {
+    updateHeaderTitle('Log');
+    const header = document.querySelector('header');
+    const clearButton = document.createElement('button');
+    clearButton.id = 'clearLogButton';
+    clearButton.className = 'clear-log-button';
+    clearButton.innerHTML = '<i class="fas fa-trash"></i>';
+    header.appendChild(clearButton);
+
+    const contentContainer = document.querySelector('main#content');
+    contentContainer.innerHTML = '';
+    contentContainer.appendChild(createLogView());
+
+    clearButton.addEventListener('click', () => {
+        localStorage.removeItem('apiLogs');
+        contentContainer.innerHTML = '';
+        contentContainer.appendChild(createLogView());
+    });
 }

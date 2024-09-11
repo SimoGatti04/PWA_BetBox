@@ -55,6 +55,17 @@
     cursor: pointer;
 }
 
+.refresh-all-button {
+    background: transparent;
+    cursor: pointer;
+    font-size: 2em;
+    color: #0a84ff;
+    background: none;
+    border: none;
+    position: absolute;
+    right: 0.75rem;
+}
+
 .history-button {
     position: absolute;
     background: none;

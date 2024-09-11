@@ -63,8 +63,9 @@
 }
 
 @media (max-width: 390px) {
+
   .spin-button {
-    left: 18.8rem;
+      left: 18.3rem;
   }
 
   .spin-box{
@@ -75,11 +76,12 @@
     width: 15rem;
   }
 
-  .bonus-value{
+  .bonus-value {
     position: absolute;
     width: 15rem;
     top: -3.9rem;
-    left: -7.4rem;
+    left: -6.2rem;
+    max-width: 13rem;
   }
 
   .bonus-label{
