@@ -1,8 +1,8 @@
 import { siteImages } from '../siteImages.js';
-import {fetchActiveBets, refreshAllBets, updateMatchResultsIfNeeded, updateSiteBets} from "./BetService.js";
-import {loadBetsFromLocalStorage, loadRemovedBetsFromLocalStorage} from "./BetStorageService.js";
-
-const BET_UPDATED_EVENT = 'betUpdated';
+import { fetchActiveBets, refreshAllBets, updateMatchResultsIfNeeded, updateSiteBets} from "./BetService.js";
+import { loadBetsFromLocalStorage, loadRemovedBetsFromLocalStorage} from "./BetStorageService.js";
+import { showBetDetails } from './BetDetailView.js';
+import {formatDate, getStatusColor, showNoBetsMessage} from "./ActiveBetsUtils.js";
 
 export function createActiveBetsView() {
     const view = document.createElement('div');
@@ -129,7 +129,6 @@ function toggleMenu() {
 
 let removedBets = {};
 
-
 export function renderBetList(bets, container) {
     container.innerHTML = '';
     let hasBets = false;
@@ -164,137 +163,6 @@ function createBetPreview(site, bet) {
     `;
     preview.addEventListener('click', () => showBetDetails(bet, true));
     return preview;
-}
-
-function showBetDetails(bet, isHistorical = false) {
-    const detailView = document.createElement('div');
-    detailView.className = 'bet-detail-view';
-
-    const updateDetailView = (event) => {
-        if (!isHistorical) {
-            const updatedBets = event.detail;
-            const updatedBet = Object.values(updatedBets)
-                .flat()
-                .find(b => b.betId === bet.betId);
-
-            if (updatedBet) {
-                detailView.innerHTML = createBetDetailContent(updatedBet, isHistorical);
-                attachCloseButtonListener(detailView, updateDetailView);
-            }
-        }
-    };
-
-    detailView.innerHTML = createBetDetailContent(bet, isHistorical);
-    attachCloseButtonListener(detailView, updateDetailView);
-
-    if (!isHistorical) {
-        window.addEventListener(BET_UPDATED_EVENT, updateDetailView);
-    }
-
-    document.body.appendChild(detailView);
-}
-
-
-function attachCloseButtonListener(detailView, updateDetailView) {
-    const closeButton = detailView.querySelector('.close-button');
-    closeButton.addEventListener('click', () => {
-        document.body.removeChild(detailView);
-        window.removeEventListener(BET_UPDATED_EVENT, updateDetailView);
-    });
-}
-
-
-function createBetDetailContent(bet, isHistorical) {
-    const eventListItems = bet.events.map(event => {
-        const matchResult = event.matchResult || {};
-        let isLive = ['IN_PLAY', 'LIVE'].some(status =>
-            matchResult.status && matchResult.status.toUpperCase() === status
-        );
-        let isNotStarted = ['NOT STARTED', 'TIMED'].some(status =>
-            matchResult.status && matchResult.status.toUpperCase() === status
-        );
-        let resultClass = isLive ? 'result in-play' : (isNotStarted ? 'result not-started' : 'result');
-
-        let resultString = isNotStarted ? '0-0' : (matchResult.score || '');
-
-        return `
-            <li class="event-item">
-                <div class="event-details">
-                    <p class="event-name"><strong>${event.name}</strong></p>
-                    <p class="event-date">${formatDate(event.date)}</p>
-                    <p class="event-selection">${event.marketType}: ${event.selection}</p>
-                    <div class="event-odds" style="color: ${getStatusColorSolid(event.result)}">${event.odds}</div>
-                    <div class="${resultClass}">${resultString}</div>
-                </div>
-            </li>
-        `;
-    });
-
-    return `
-        <div class="bet-detail-header">
-            <h2>Dettagli Scommessa</h2>
-            <button class="close-button">×</button>
-        </div>
-        <div class="bet-detail-content">
-            <div class="bet-summary">
-                <span class="bet-stake-odds">${bet.importoGiocato}@${bet.quotaTotale}</span>
-                <span class="bet-potential-win" style="color: ${getStatusColorSolid(bet.esitoTotale)}">
-                    ${bet.vincitaPotenziale}
-                </span>
-            </div>
-            <h3>Eventi:</h3>
-            <ul class="event-list">
-                ${eventListItems.join('')}
-            </ul>
-        </div>
-    `;
-}
-
-function getStatusColor(status) {
-    switch (status.toLowerCase()) {
-        case 'in corso':
-            return 'rgba(128, 128, 0, 0.35)'; // Yellow with opacity
-        case 'perdente':
-        case 'perso':
-            return 'rgba(128, 0, 0, 0.35)'; // Red with opacity
-        case 'vincente':
-        case 'vinto':
-            return 'rgba(0, 128, 0, 0.35)'; // Green with opacity
-        default:
-            return 'rgba(128, 128, 128, 0.35)'; // Grey with opacity for unknown status
-    }
-}
-function getStatusColorSolid(status) {
-    switch (status.toLowerCase()) {
-        case 'in corso':
-            return 'rgb(150, 150, 0)'; // Solid Yellow
-        case 'perdente':
-        case 'perso':
-            return 'rgb(150, 0, 0)'; // Solid Red
-        case 'vincente':
-        case 'vinto':
-            return 'rgb(0, 150, 0)'; // Solid Green
-        default:
-            return 'rgb(150, 150, 150)'; // Solid Grey for unknown status
-    }
-}
-
-
-function showNoBetsMessage(container) {
-    const message = document.createElement('div');
-    message.className = 'no-bets-message';
-    message.textContent = 'Nessuna scommessa attiva';
-    container.appendChild(message);
-}
-
-function formatDate(timestamp) {
-    const date = new Date(parseInt(timestamp));
-    return date.toLocaleString('it-IT', {
-        day: '2-digit',
-        month: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
 }
 
 document.addEventListener('visibilitychange', () => {

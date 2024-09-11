@@ -6,7 +6,7 @@ import {
     saveBetsToLocalStorage,
     saveRemovedBetsToLocalStorage
 } from "./BetStorageService.js";
-import {renderBetList} from "./ActiveBetsView.js";
+import { renderBetList } from "./ActiveBetsView.js";
 
 export const BET_UPDATED_EVENT = 'betUpdated';
 
