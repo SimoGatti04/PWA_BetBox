@@ -1,5 +1,5 @@
-import { createBalanceView, fetchAllRecentBalances } from './BalanceView.js';
-import { createSpinView } from './SpinView.js';
+import { createBalanceView, fetchAllRecentBalances } from './BalanceView/BalanceView.js';
+import { createSpinView } from './SpinView/SpinView.js';
 import { createActiveBetsView } from './ActiveBets/ActiveBetsView.js';
 import { createLogView } from './ApiLogs/LogView.js';
 

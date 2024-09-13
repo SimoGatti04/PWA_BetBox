@@ -1,3 +1,5 @@
+import { getRomeTime } from "../utils.js";
+
 export function saveBetsToLocalStorage(bets) {
     localStorage.setItem('activeBets', JSON.stringify(bets));
 }
@@ -12,13 +14,12 @@ export function saveRemovedBetsToLocalStorage(removedBets) {
 }
 
 export function loadRemovedBetsFromLocalStorage() {
-    const savedRemovedBets = localStorage.getItem('removedBets');
-    return savedRemovedBets ? JSON.parse(savedRemovedBets) : {};
+    const removedBets = localStorage.getItem('removedBets');
+    return removedBets ? JSON.parse(removedBets) : {};
 }
 
-
 export function cleanupRemovedBets() {
-    const now = Date.now();
+    const now = new Date(getRomeTime());
     const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
     let removedBets = loadRemovedBetsFromLocalStorage();
 
@@ -31,5 +32,4 @@ export function cleanupRemovedBets() {
     saveRemovedBetsToLocalStorage(removedBets);
 }
 
-setInterval(cleanupRemovedBets, 24 * 60 * 60 * 1000);
 

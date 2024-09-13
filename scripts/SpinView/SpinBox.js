@@ -1,4 +1,4 @@
-import { siteImages } from './siteImages.js';
+import { siteImages } from '../siteImages.js';
 
 export function createSpinBox(site, lastBonus, onSpinClick, onViewLogClick) {
   const box = document.createElement('div');

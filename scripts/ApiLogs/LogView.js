@@ -1,6 +1,5 @@
 export function createLogView() {
     checkAndCleanLogs();
-
     const view = document.createElement('div');
     view.className = 'log-container';
 

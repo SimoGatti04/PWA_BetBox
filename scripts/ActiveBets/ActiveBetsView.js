@@ -1,8 +1,13 @@
 import { siteImages } from '../siteImages.js';
-import { fetchActiveBets, refreshAllBets, updateMatchResultsIfNeeded, updateSiteBets} from "./BetService.js";
-import { loadBetsFromLocalStorage, loadRemovedBetsFromLocalStorage} from "./BetStorageService.js";
+import {
+    fetchActiveBets,
+    refreshAllBets,
+    updateMatchResultsIfNeeded,
+    updateSiteBets
+} from "./BetService.js";
+import {cleanupRemovedBets, loadBetsFromLocalStorage, loadRemovedBetsFromLocalStorage} from "./BetStorageService.js";
 import { showBetDetails } from './BetDetailView.js';
-import {formatDate, getStatusColor, showNoBetsMessage} from "./ActiveBetsUtils.js";
+import { formatDate, getStatusColor, showNoBetsMessage } from "./ActiveBetsUtils.js";
 
 export function createActiveBetsView() {
     const view = document.createElement('div');
@@ -26,6 +31,12 @@ export function createActiveBetsView() {
 
     updateMatchResultsIfNeeded(savedBets, betList);
 
+    setInterval(() => {
+        const savedBets = loadBetsFromLocalStorage();
+        updateMatchResultsIfNeeded(savedBets, betList);
+    }, 5 * 60 * 1000);
+
+
     return view;
 }
 
@@ -45,20 +56,31 @@ function showBetHistory() {
 
 function createBetHistoryModal(history) {
     const modalContainer = document.createElement('div');
-    modalContainer.className = 'modal-container';
+    modalContainer.className = 'bet-history-container';
 
     const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
+    modalContent.className = 'bet-history-content';
+
+    const headerContainer = document.createElement('div');
+    headerContainer.className = 'bet-history-header';
+
+    const title = document.createElement('h2');
+    title.textContent = 'Cronologia Bets';
+
+    const cleanupButton = document.createElement('button');
+    cleanupButton.className = 'cleanup-button';
+    cleanupButton.innerHTML = '<i class="fas fa-trash"></i>';
+    cleanupButton.addEventListener('click', manualCleanupRemovedBets);
+
+    headerContainer.appendChild(title);
 
     const closeButton = document.createElement('span');
     closeButton.className = 'close-button';
     closeButton.textContent = '×';
     closeButton.addEventListener('click', () => modalContainer.remove());
-    modalContent.appendChild(closeButton);
 
-    const title = document.createElement('h2');
-    title.textContent = 'Cronologia scommesse';
-    modalContent.appendChild(title);
+    modalContent.appendChild(headerContainer);
+    modalContent.appendChild(closeButton);
 
     const historyList = document.createElement('div');
     historyList.className = 'bet-list history-list scrollable-content';
@@ -70,11 +92,30 @@ function createBetHistoryModal(history) {
         });
     }
 
+    const bottomBar = document.createElement('div');
+    bottomBar.className = 'bottom-bet-history-bar';
+
+    bottomBar.appendChild(cleanupButton)
+
     modalContent.appendChild(historyList);
+    modalContent.appendChild(bottomBar);
+
     modalContainer.appendChild(modalContent);
+
+    cleanupRemovedBets();
 
     return modalContainer;
 }
+
+function manualCleanupRemovedBets() {
+    cleanupRemovedBets();
+    const historyModal = document.querySelector('.bet-history-container');
+    if (historyModal) {
+        historyModal.remove();
+        showBetHistory();
+    }
+}
+
 
 function createHeader() {
     const header = document.createElement('div');
@@ -103,24 +144,50 @@ function createBetList() {
     return betList;
 }
 function createMenu() {
+    const header = document.createElement('div');
+    header.className = 'update-menu-header';
+
+    const titleText = document.createElement('h1');
+    titleText.textContent = 'Aggiorna Bets';
+    titleText.className = 'update-menu-title';
+
+    header.appendChild(titleText);
+
     const sites = ['goldbet', 'bet365', 'eurobet', 'sisal', 'snai', 'lottomatica', 'cplay'];
     const menu = document.createElement('div');
+    menu.appendChild(header);
     menu.className = 'update-menu overlay';
     menu.style.display = 'none';
 
-    sites.forEach(site => {
-        const item = document.createElement('div');
-        item.className = 'menu-item';
-        item.textContent = `Update ${site.charAt(0).toUpperCase() + site.slice(1)}`;
-        item.addEventListener('click', () => {
-            updateSiteBets(site);
-            toggleMenu();
-        });
-        menu.appendChild(item);
-    });
+
+    for (let i = 0; i < sites.length; i += 2) {
+        const row = document.createElement('div');
+        row.className = 'menu-row';
+
+        for (let j = i; j < Math.min(i + 2, sites.length); j++) {
+            const site = sites[j];
+            const item = document.createElement('div');
+            item.className = 'menu-item';
+
+            const img = document.createElement('img');
+            img.src = siteImages[site];
+            img.alt = `Update ${site}`;
+            img.title = `Update ${site}`;
+
+            item.appendChild(img);
+            item.addEventListener('click', () => {
+                updateSiteBets(site);
+                toggleMenu();
+            });
+            row.appendChild(item);
+        }
+
+        menu.appendChild(row);
+    }
 
     return menu;
 }
+
 
 function toggleMenu() {
     const menu = document.querySelector('.update-menu');
@@ -172,6 +239,5 @@ document.addEventListener('visibilitychange', () => {
         updateMatchResultsIfNeeded(savedBets, betList);
     }
 });
-
 
 

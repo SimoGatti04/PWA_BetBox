@@ -1,5 +1,7 @@
-import { siteImages } from './siteImages.js';
-import config from "../config.js";
+import { siteImages } from '../siteImages.js';
+import { getRomeTime } from '../utils.js';
+import config from "../../config.js";
+import {showBalanceDetails} from "./BalanceDetailView.js";
 
 const fetchingStatus = {};
 let isFetching = false;
@@ -22,6 +24,10 @@ export function createBalanceView() {
 
     sites.forEach(site => {
         const card = createBalanceCard(site, balances[site]);
+        card.addEventListener('click', () => {
+            const currentBalance = loadBalances()[site];
+            showBalanceDetails(site, currentBalance);
+        });
         view.appendChild(card);
     });
 
@@ -79,46 +85,7 @@ function createBalanceCard(site, balance) {
     balanceText.textContent = balance || 'N/A';
     card.appendChild(balanceText);
 
-    const historyButton = document.createElement('button');
-    historyButton.className = 'history-button';
-    historyButton.innerHTML = '<i class="fas fa-sync-alt"></i>';
-    historyButton.addEventListener('click', async () => {
-        const history = await fetchBalanceHistory(site);
-        if (history) {
-            const latestBalance = history[history.length - 1];
-            updateBalance(site, latestBalance);
-        }
-    });
-    card.appendChild(historyButton);
-
-    const playButton = document.createElement('button');
-    playButton.className = 'play-button';
-    playButton.innerHTML = '<i class="fas fa-play"></i>';
-    playButton.addEventListener('click', () => fetchBalance(site));
-    card.appendChild(playButton);
-
-    const logButton = document.createElement('button');
-    logButton.className = 'log-button';
-    logButton.innerHTML = '<i class="fas fa-clipboard-list"></i>';
-    logButton.addEventListener('click', () => {
-        const balanceHistory = loadBalanceHistory();
-        const history = balanceHistory[site] || [];
-        const modal = createBalanceHistoryModal(site, history);
-        document.body.appendChild(modal);
-    });
-    card.appendChild(logButton);
-
     return card;
-}
-
-async function openBalanceHistory(site) {
-    const history = await fetchBalanceHistory(site);
-    if (history) {
-        const modal = createBalanceHistoryModal(site, history);
-        document.body.appendChild(modal);
-    } else {
-        console.error('Errore nel recupero della cronologia dei saldi:', error);
-    }
 }
 
 function createBalanceHistoryModal(site, history) {
@@ -172,7 +139,7 @@ function formatDate(dateString) {
     });
 }
 
-async function fetchBalance(site) {
+export async function fetchBalance(site) {
     if (fetchingStatus[site]) {
         console.log(`Richiesta per il sito ${site} già in corso, evitando duplicati.`);
         return;
@@ -213,7 +180,7 @@ async function fetchBalance(site) {
     }
 }
 
-async function fetchBalanceHistory(site) {
+export async function fetchBalanceHistory(site) {
     if (isFetching) {
         console.log(`Richiesta per la cronologia del sito ${site} già in corso, evitando duplicati.`);
         return;
@@ -258,7 +225,7 @@ function saveBalanceHistory(site, history) {
     localStorage.setItem('balanceHistory', JSON.stringify(balanceHistory));
 }
 
-function loadBalanceHistory() {
+export function loadBalanceHistory() {
     const balanceHistory = localStorage.getItem('balanceHistory');
     return balanceHistory ? JSON.parse(balanceHistory) : {};
 }
@@ -293,7 +260,7 @@ function renderBalances(balances) {
 
 function checkAndFetchBalancesOnceADay() {
     const lastFetchDate = localStorage.getItem('lastFetchDate');
-    const currentDate = new Date();
+    const currentDate = new Date(getRomeTime());
     const currentHour = currentDate.getHours();
 
     if (lastFetchDate) {

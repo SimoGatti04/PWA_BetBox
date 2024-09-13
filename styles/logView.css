@@ -1,5 +1,7 @@
 .log-container {
     padding: 10px;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .log-list {

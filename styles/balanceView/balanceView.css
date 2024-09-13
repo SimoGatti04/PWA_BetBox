@@ -44,17 +44,6 @@
     left: 16rem;
 }
 
-.refresh-button {
-    position: absolute;
-    top: 5rem;
-    right: 5rem;
-    background: none;
-    border: none;
-    color: #0a84ff;
-    font-size: 7rem;
-    cursor: pointer;
-}
-
 .refresh-all-button {
     background: transparent;
     cursor: pointer;
@@ -139,50 +128,6 @@
         text-align: center;
         top: 1.80rem;
         left: 3.75rem;
-    }
-
-    .play-button {
-        position: absolute;
-        background: none;
-        border: none;
-        color: #0a84ff;
-        font-size: 1.75rem;
-        cursor: pointer;
-        bottom: 5.25rem;
-        left: -0.75rem;
-        height: 2rem;
-        width: 2rem;
-    }
-
-    .history-button{
-        position: absolute;
-        background: none;
-        border: none;
-        color: #0a84ff;
-        cursor: pointer;
-        top: -0.3rem;
-        right: 1rem;
-        width: 2rem;
-        height: 2rem;
-    }
-
-    .history-button i {
-        font-size: 1.5rem;
-        position: absolute;
-        left: 0.7rem;
-    }
-
-    .log-button {
-        position: absolute;
-        width: 2rem;
-        height: 2rem;
-        top: 5.1rem;
-        left: -0.5rem;
-        background: transparent none;
-        border: none;
-        font-size: 1.5rem;
-        color: #0a84ff;
-        cursor: pointer;
     }
 
 }

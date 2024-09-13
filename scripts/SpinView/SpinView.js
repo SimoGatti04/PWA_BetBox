@@ -1,6 +1,7 @@
 import { createSpinBox } from './SpinBox.js';
-import { createBonusLogModal } from './BonusLogModal.js';
-import config from "../config.js";
+import { createBonusLogModal } from '../BonusLogModal.js';
+import { getRomeTime } from '../utils.js';
+import config from "../../config.js";
 
 // Replace the global isFetching variable with an object
 let fetchingStatus = {};
@@ -8,6 +9,7 @@ let bonusHistory = loadSpinHistory();
 
 
 export function createSpinView() {
+  console.log(new Date(getRomeTime()));
   const view = document.createElement('div');
   view.className = 'spin-view';
 
@@ -15,7 +17,7 @@ export function createSpinView() {
   sitesContainer.className = 'sites-container';
 
   const sites = ['goldbet', 'lottomatica', 'snai'];
-  const today = new Date().toISOString().split('T')[0];
+  const today =new Date(getRomeTime()).toISOString().split('T')[0];
   let shouldFetch = false;
 
   sites.forEach(site => {
@@ -124,7 +126,7 @@ function updateSpinBox(site, spinHistory) {
     } else {
       console.error(`Elemento .bonus-value non trovato per il sito ${site}`);
     }
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date(getRomeTime()).toISOString().split('T')[0];
     if (lastSpin.date.split('T')[0] === today && lastSpin.result &&
         lastSpin.result.tipo !== 'Nullo' && lastSpin.result.tipo !== 'N/A' && lastSpin.result.tipo !== null) {
       spinBox.classList.add('bonus-today');

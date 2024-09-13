@@ -3,6 +3,9 @@ import { formatDate, getStatusColorSolid } from './ActiveBetsUtils.js';
 const BET_UPDATED_EVENT = 'betUpdated';
 export function showBetDetails(bet, isHistorical = false) {
     const detailScreen = createBetDetailsScreen(bet, isHistorical);
+    detailScreen.dataset.betId = bet.betId;
+    detailScreen.dataset.site = bet.site; // Assicurati che 'site' sia una proprietà di 'bet'
+
     const keyDownHandler = handleKeyDown(detailScreen);
     const updateHandler = updateDetailScreen(bet, detailScreen, isHistorical);
 
@@ -44,12 +47,13 @@ function updateDetailScreen(bet, detailScreen, isHistorical) {
                 .find(b => b.betId === bet.betId);
 
             if (updatedBet) {
-                detailScreen.innerHTML = '';
-                detailScreen.appendChild(createBetDetailsScreen(updatedBet, isHistorical));
+                detailScreen.innerHTML = createBetDetailsScreen(updatedBet, isHistorical).innerHTML;
             }
         }
     };
 }
+
+
 
 function closeBetDetails(detailScreen, keyDownHandler, updateHandler) {
     detailScreen.style.transform = 'translateX(100%)';
@@ -107,7 +111,7 @@ function createBetDetailsScreen(bet, isHistorical = false) {
     detailScreen.className = 'bet-detail-screen';
 
     const backButton = document.createElement('button');
-    backButton.className = 'back-button';
+    backButton.className = 'bet-detail-back-button';
     backButton.innerHTML = '<i class="fas fa-arrow-left"></i>';
     backButton.addEventListener('click', () => closeBetDetails(detailScreen));
 
