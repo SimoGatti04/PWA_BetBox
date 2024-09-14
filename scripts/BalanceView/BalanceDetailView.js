@@ -1,8 +1,10 @@
-import {fetchBalance, loadBalanceHistory} from "./BalanceView.js";
+import {fetchBalance, fetchBalanceHistory, loadBalanceHistory, loadBalances, saveBalances} from "./BalanceView.js";
 import {siteImages} from "../siteImages.js";
 
 export function showBalanceDetails(site, balance) {
-    const detailScreen = createBalanceDetailScreen(site, balance);
+    const latestBalance = loadBalances()[site] || balance;
+    const detailScreen = createBalanceDetailScreen(site, latestBalance);
+    detailScreen.dataset.site = site;
     document.body.appendChild(detailScreen);
 
     // Slide-in animation
@@ -43,7 +45,7 @@ function createBalanceDetailHeader(site, detailScreen) {
     header.className = 'balance-detail-header';
 
     const backButton = createButton('bet-detail-back-button', 'fa-arrow-left', () => closeBalanceDetails(detailScreen));
-    const refreshButton = createButton('refresh-button', 'fa-sync-alt', () => fetchBalance(site));
+    const refreshButton = createButton('refresh-button', 'fa-sync-alt', () => updateBalanceHistoryAndDisplay(site));
     const playButton = createButton('play-button', 'fa-play', () => fetchBalance(site));
 
     header.appendChild(backButton);
@@ -150,7 +152,60 @@ export function closeBalanceDetails(detailScreen) {
     }
 }
 
+function updateBalanceDisplay(detailScreen, balance) {
+    const balanceAmount = detailScreen.querySelector('.balance-amount');
+    if (balanceAmount) {
+        balanceAmount.textContent = balance;
+    }
+}
 
+async function updateBalanceHistoryAndDisplay(site) {
+    const history = await fetchBalanceHistory(site);
+    if (history && history.length > 0) {
+        const latestBalance = history[history.length - 1].balance;
+        const detailScreen = document.querySelector('.balance-detail-screen');
+        if (detailScreen && detailScreen.dataset.site === site) {
+            updateBalanceDisplay(detailScreen, latestBalance);
+            updateBalanceHistoryDisplay(site, history);
+            // Update local storage
+            const balances = loadBalances();
+            balances[site] = latestBalance;
+            saveBalances(balances);
+        }
+    }
+}
+
+function updateBalanceHistoryDisplay(site, history) {
+    const historyContainer = document.querySelector('.balance-history');
+    if (historyContainer) {
+        const historyList = historyContainer.querySelector('ul') || document.createElement('ul');
+        historyList.innerHTML = '';
+
+        const groupedHistory = getGroupedBalanceHistory(site);
+
+        groupedHistory.forEach(entry => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <span class="history-date">${entry.dateRange}</span>
+                <span class="history-balance">${entry.balance}</span>
+            `;
+            historyList.appendChild(listItem);
+        });
+
+        historyContainer.appendChild(historyList);
+    }
+}
+
+
+
+
+window.addEventListener('balanceUpdated', (event) => {
+    const { site, balance } = event.detail;
+    const detailScreen = document.querySelector('.balance-detail-screen');
+    if (detailScreen && detailScreen.dataset.site === site) {
+        updateBalanceDisplay(detailScreen, balance);
+    }
+});
 
 
 

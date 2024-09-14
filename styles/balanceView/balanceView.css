@@ -52,7 +52,7 @@
     background: none;
     border: none;
     position: absolute;
-    right: 0rem;
+    right: -1rem;
 }
 
 .history-button {

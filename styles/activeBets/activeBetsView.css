@@ -5,7 +5,7 @@
     color: #0a84ff;
     font-size: 2rem;
     cursor: pointer;
-    right:6.3rem;
+    right:5.3rem;
     top:1.5rem;
 }
 
@@ -16,7 +16,7 @@
     color: #0a84ff;
     font-size: 2rem;
     cursor: pointer;
-    right: 2.5rem;
+    right: 1.5rem;
     top: 1.5rem;
 }
 
@@ -27,7 +27,7 @@
     color: #0a84ff;
     font-size: 2rem;
     cursor: pointer;
-    right: 0rem;
+    right: -1rem;
     top: 1.5rem;
 }
 
@@ -102,13 +102,13 @@
 }
 
 .bet-history-button {
-    left: 1rem;
+    right: -0.5rem;
     position: absolute;
     background: none;
     border: none;
     color: #0a84ff;
     cursor: pointer;
-    top: 42rem;
+    bottom: 4.5rem;
     width: 4rem;
     height: 4rem;
 }
@@ -188,7 +188,7 @@
     font-size: 2rem;
     cursor: pointer;
     position: relative;
-    left: 18.7rem;
+    left: 17.7rem;
 }
 
 .bet-history-header {

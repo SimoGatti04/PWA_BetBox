@@ -1,7 +1,18 @@
-const isTestMode = true; // Cambia questo valore per passare tra modalità test e produzione
+const isTestMode = false;
+const isiPhoneDebug = true;
+
+let apiBaseUrl;
+
+if (!isTestMode) {
+    apiBaseUrl = 'https://legally-modest-joey.ngrok-free.app';
+} else if (isTestMode && !isiPhoneDebug) {
+    apiBaseUrl = 'http://localhost:3000';
+} else if (isTestMode && isiPhoneDebug) {
+    apiBaseUrl = 'http://192.168.0.58:3000';
+}
 
 const config = {
-  apiBaseUrl: isTestMode ? 'http://localhost:3000' : 'https://legally-modest-joey.ngrok-free.app'
+    apiBaseUrl: apiBaseUrl
 };
 
 export default config;

@@ -6,11 +6,11 @@ import {showBalanceDetails} from "./BalanceDetailView.js";
 const fetchingStatus = {};
 let isFetching = false;
 
-function saveBalances(balances) {
+export function saveBalances(balances) {
     localStorage.setItem('balances', JSON.stringify(balances));
 }
 
-function loadBalances() {
+export function loadBalances() {
     const balances = localStorage.getItem('balances');
     return balances ? JSON.parse(balances) : {};
 }
@@ -217,6 +217,9 @@ export async function fetchBalanceHistory(site) {
     } finally {
         isFetching = false;
     }
+
+    updateBalance(site, data.balance);
+    window.dispatchEvent(new CustomEvent('balanceUpdated', { detail: { site, balance: data.balance } }));
 }
 
 function saveBalanceHistory(site, history) {
@@ -304,4 +307,9 @@ document.addEventListener('visibilitychange', () => {
     console.log('Utente uscito dall\'app. Considero la richiesta chiusa.');
     isFetching = false;
   }
+});
+
+document.addEventListener('balanceUpdated', (event) => {
+    const { site, balance } = event.detail;
+    updateBalance(site, balance);
 });

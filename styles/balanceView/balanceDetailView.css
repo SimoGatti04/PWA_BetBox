@@ -38,7 +38,8 @@
     font-size: 5rem;
     text-align: center;
     position: relative;
-    top: -1rem;
+    top: -3rem;
+    font-weight: bold;
 }
 
 .balance-history {
@@ -56,7 +57,7 @@
     list-style-type: none;
     padding: 0;
     position: relative;
-    top: -2rem;
+    top: -7rem;
     font-size: 1.5rem;
 }
 
@@ -66,8 +67,8 @@
 
 .refresh-button {
     position: absolute;
-    top: 7.8rem;
-    right: -0.3rem;
+    top: 5.65rem;
+    right: -2.6rem;
     background: none;
     border: none;
     color: #0a84ff;
@@ -77,8 +78,8 @@
 
 .bet-detail-back-button {
     position: absolute;
-    top: 0.2rem;
-    left: 0rem;
+    top: 1rem;
+    left: -0.5rem;
     background: none;
     border: none;
     font-size: 2rem;
@@ -93,15 +94,15 @@
     color: #0a84ff;
     font-size: 2.5rem;
     cursor: pointer;
-    top: 7.85rem;
-    left: 0rem;
+    top: 5.85rem;
+    left: -2rem;
     height: 2rem;
     width: 2rem;
 }
 
-.balance-history-header{
+.balance-history-header {
     position: relative;
-    top: -3rem;
+    top: -9rem;
     font-size: 1.5rem;
     text-align: center;
 }
