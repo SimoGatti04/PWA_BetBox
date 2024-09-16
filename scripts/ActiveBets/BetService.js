@@ -142,12 +142,27 @@ export function mergeServerAndLocalBets(savedBets, comparison) {
         updatedBets[site] = updatedBets[site].filter(bet =>
             !comparison[site].toRemove.includes(bet.betId)
         );
+
+        comparison[site].toKeep.forEach(serverBet => {
+            const localBet = updatedBets[site].find(bet => bet.betId === serverBet.betId);
+            if (localBet) {
+                localBet.esitoTotale = serverBet.esitoTotale;
+                serverBet.events.forEach(serverEvent => {
+                    const localEvent = localBet.events.find(event => event.name === serverEvent.name);
+                    if (localEvent) {
+                        localEvent.status = serverEvent.status;
+                    }
+                });
+            }
+        });
+
         updatedBets[site].push(...comparison[site].toAdd);
     }
 
     saveRemovedBetsToLocalStorage(removedBets);
     return updatedBets;
 }
+
 
 export function updateBetDetailView(updatedBet) {
     const detailView = document.querySelector('.bet-detail-screen');

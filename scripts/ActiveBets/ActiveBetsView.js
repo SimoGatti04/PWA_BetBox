@@ -177,7 +177,7 @@ function createBetHistoryModal(history) {
 }
 
 function manualCleanupRemovedBets() {
-    cleanupRemovedBets();
+    localStorage.removeItem('removedBets');
     const historyModal = document.querySelector('.bet-history-container');
     if (historyModal) {
         historyModal.remove();
