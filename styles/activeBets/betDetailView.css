@@ -137,3 +137,52 @@
     color: #fff;
 }
 
+@media (min-width: 600px) {
+
+    .result {
+        font-weight: bold;
+        margin-top: 2px;
+        position: relative;
+        left: 37.25rem;
+        bottom: 6.672rem;
+        background-color: transparent;
+        width: 2.4rem;
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
+    }
+
+    .event-odds {
+        align-self: center;
+        font-weight: bold;
+        position: relative;
+        bottom: 2.13rem;
+        left: 37.6rem;
+        max-width: 3rem;
+    }
+
+    .bet-potential-win {
+        font-weight: bold;
+        color: #4CAF50;
+        position: relative;
+        left: 10.5rem;
+    }
+
+    .bet-stake-odds {
+        font-weight: bold;
+        position: relative;
+        left: 18rem;
+        top: -0.25rem;
+    }
+
+    .bet-detail-back-button {
+        position: absolute;
+        top: 1rem;
+        left: 1.5rem;
+        background: none;
+        border: none;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #fff;
+    }
+
+}

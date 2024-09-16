@@ -11,7 +11,8 @@ import { getRomeTime } from '../utils.js';
 
 export const BET_UPDATED_EVENT = 'betUpdated';
 
-export async function fetchActiveBets() {
+
+export async function recoverActiveBets() {
     try {
         const response = await fetch(`${config.apiBaseUrl}/bets/fetch-active-bets`, {
             method: 'POST',
@@ -72,8 +73,8 @@ export async function updateSiteBets(site) {
 
 export function updateMatchResultsIfNeeded(bets, betList) {
     const now = new Date(getRomeTime()).getTime();
-    const lastRequestTime = new Date(getRomeTime(localStorage.getItem('lastResultRequestTime'))) || 0;
-    const fiveMinutes = 5 * 60 * 1000;
+    const lastRequestTime = localStorage.getItem('lastResultRequestTime') || 0;
+    const oneMinute = 60 * 1000;
 
     const eventsToUpdate = Object.values(bets).flatMap(site =>
         Object.values(site).flatMap(bet =>
@@ -84,9 +85,9 @@ export function updateMatchResultsIfNeeded(bets, betList) {
                     const eventDate = event.date;
                     return now >= eventDate;
                 }
-                if (['IN_PLAY', 'LIVE'].includes(event.matchResult?.status?.toUpperCase())) {
+                if (['IN_PLAY', 'LIVE', 'PAUSED'].includes(event.matchResult?.status?.toUpperCase())) {
                     console.log("Passato da IN PLAY")
-                    return now - lastRequestTime >= fiveMinutes;
+                    return now - lastRequestTime >= oneMinute;
                 }
                 return false; // Don't update finished matches
             }) : []
@@ -112,7 +113,7 @@ export async function updateMatchResults(events, bets, betList) {
         }));
     }
 
-    localStorage.setItem('lastResultRequestTime', new Date(getRomeTime()).toString());
+    localStorage.setItem('lastResultRequestTime', new Date(getRomeTime()).getTime().toString());
     saveBetsToLocalStorage(bets);
     renderBetList(bets, betList);
     document.dispatchEvent(new CustomEvent(BET_UPDATED_EVENT, { detail: bets }));
@@ -167,7 +168,7 @@ export function updateBetDetailView(updatedBet) {
 function getStatusClass(status) {
     if (!status) return '';
     status = status.toUpperCase();
-    if (['IN_PLAY', 'LIVE'].includes(status)) return 'in-play';
+    if (['IN_PLAY', 'LIVE', 'PAUSED'].includes(status)) return 'in-play';
     if (['NOT STARTED', 'TIMED'].includes(status)) return 'not-started';
     return '';
 }

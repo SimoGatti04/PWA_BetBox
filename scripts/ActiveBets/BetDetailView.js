@@ -1,6 +1,7 @@
-import { formatDate, getStatusColorSolid } from './ActiveBetsUtils.js';
+import { formatDate, getStatusColor } from './ActiveBetsUtils.js';
 
 const BET_UPDATED_EVENT = 'betUpdated';
+
 export function showBetDetails(bet, isHistorical = false) {
     const detailScreen = createBetDetailsScreen(bet, isHistorical);
     detailScreen.dataset.betId = bet.betId;
@@ -53,8 +54,6 @@ function updateDetailScreen(bet, detailScreen, isHistorical) {
     };
 }
 
-
-
 function closeBetDetails(detailScreen, keyDownHandler, updateHandler) {
     detailScreen.style.transform = 'translateX(100%)';
     setTimeout(() => {
@@ -67,7 +66,7 @@ function closeBetDetails(detailScreen, keyDownHandler, updateHandler) {
 function createBetDetailContent(bet, isHistorical) {
     const eventListItems = bet.events.map(event => {
         const matchResult = event.matchResult || {};
-        let isLive = ['IN_PLAY', 'LIVE'].some(status =>
+        let isLive = ['IN_PLAY', 'LIVE', 'PAUSED'].some(status =>
             matchResult.status && matchResult.status.toUpperCase() === status
         );
         let isNotStarted = ['NOT STARTED', 'TIMED'].some(status =>
@@ -83,7 +82,7 @@ function createBetDetailContent(bet, isHistorical) {
                     <p class="event-name"><strong>${event.name}</strong></p>
                     <p class="event-date">${formatDate(event.date)}</p>
                     <p class="event-selection">${event.marketType}: ${event.selection}</p>
-                    <div class="event-odds" style="color: ${getStatusColorSolid(event.result)}">${event.odds}</div>
+                    <div class="event-odds" style="color: ${getStatusColor(event.result, true)}">${event.odds}</div>
                     <div class="${resultClass}">${resultString}</div>
                 </div>
             </li>
@@ -95,7 +94,7 @@ function createBetDetailContent(bet, isHistorical) {
             <span class="bet-stake-odds">${bet.importoGiocato}@${bet.quotaTotale}</span>
         </div>
         <div class="bet-detail-header">
-            <h2 class="bet-potential-win" style="color: ${getStatusColorSolid(bet.esitoTotale)}">
+            <h2 class="bet-potential-win" style="color: ${getStatusColor(bet.esitoTotale, true)}">
                     ${bet.vincitaPotenziale}</h2>
         </div>
         <div class="bet-detail-content">

@@ -1,32 +1,21 @@
-export function getStatusColor(status) {
+export function getStatusColor(status, isSolid = false) {
+    let opacity = 0.35;
+    if (isSolid) {
+        opacity = 1;
+    }
     switch (status.toLowerCase()) {
         case 'in corso':
-            return 'rgba(128, 128, 0, 0.35)'; // Yellow with opacity
+            return `rgba(128, 128, 0, ${opacity})`; // Yellow with opacity
         case 'perdente':
         case 'perso':
-            return 'rgba(128, 0, 0, 0.35)'; // Red with opacity
+            return `rgba(128, 0, 0, ${opacity})`; // Red with opacity
         case 'vincente':
         case 'vinto':
-            return 'rgba(0, 128, 0, 0.35)'; // Green with opacity
+            return `rgba(0, 128, 0, ${opacity})`; // Green with opacity
         default:
-            return 'rgba(128, 128, 128, 0.35)'; // Grey with opacity for unknown status
+            return `rgba(128, 128, 128, ${opacity})`; // Grey with opacity for unknown status
     }
 }
-export function getStatusColorSolid(status) {
-    switch (status.toLowerCase()) {
-        case 'in corso':
-            return 'rgb(150, 150, 0)'; // Solid Yellow
-        case 'perdente':
-        case 'perso':
-            return 'rgb(150, 0, 0)'; // Solid Red
-        case 'vincente':
-        case 'vinto':
-            return 'rgb(0, 150, 0)'; // Solid Green
-        default:
-            return 'rgb(150, 150, 150)'; // Solid Grey for unknown status
-    }
-}
-
 
 export function showNoBetsMessage(container) {
     const message = document.createElement('div');

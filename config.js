@@ -1,5 +1,5 @@
 const isTestMode = false;
-const isiPhoneDebug = true;
+const isiPhoneDebug = false;
 
 let apiBaseUrl;
 

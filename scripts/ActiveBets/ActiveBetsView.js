@@ -1,6 +1,6 @@
 import { siteImages } from '../siteImages.js';
 import {
-    fetchActiveBets,
+    recoverActiveBets,
     refreshAllBets,
     updateMatchResultsIfNeeded,
     updateSiteBets
@@ -9,13 +9,24 @@ import {cleanupRemovedBets, loadBetsFromLocalStorage, loadRemovedBetsFromLocalSt
 import { showBetDetails } from './BetDetailView.js';
 import { formatDate, getStatusColor, showNoBetsMessage } from "./ActiveBetsUtils.js";
 
+let removedBets = {};
+
 export function createActiveBetsView() {
     const view = document.createElement('div');
     view.className = 'active-bets-view';
+
     const header = createHeader();
-    const betList = createBetList();
-    const historyButton = createHistoryButton();
+
+    const betList = document.createElement('div');
+    betList.className = 'bet-list';
+
+    const historyButton = document.createElement('button');
+    historyButton.className = 'bet-history-button';
+    historyButton.innerHTML = '<i class="fas fa-clipboard-list"></i>';
+    historyButton.addEventListener('click', showBetHistory);
+
     const menu = createMenu();
+
     view.appendChild(header);
     view.appendChild(menu);
     view.appendChild(betList);
@@ -40,18 +51,76 @@ export function createActiveBetsView() {
     return view;
 }
 
-function createHistoryButton() {
-    const historyButton = document.createElement('button');
-    historyButton.className = 'bet-history-button';
-    historyButton.innerHTML = '<i class="fas fa-clipboard-list"></i>';
-    historyButton.addEventListener('click', showBetHistory);
-    return historyButton;
+function createHeader() {
+    const header = document.createElement('div');
+
+    header.className = 'active-bets-header';
+
+    const fetchButton = createButton('fetch-bets-button', 'fa-play', recoverActiveBets);
+    const refreshButton = createButton('refresh-bets-button', 'fa-sync-alt', refreshAllBets);
+    const menuButton = createButton('menu-button', 'fa-ellipsis-v', toggleMenu);
+
+    header.appendChild(fetchButton);
+    header.appendChild(refreshButton);
+    header.appendChild(menuButton);
+
+    return header;
+}
+
+function createMenu() {
+    const header = document.createElement('div');
+    header.className = 'update-menu-header';
+
+    const titleText = document.createElement('h1');
+    titleText.textContent = 'Aggiorna Bets';
+    titleText.className = 'update-menu-title';
+
+    header.appendChild(titleText);
+
+    const sites = ['goldbet', 'bet365', 'eurobet', 'sisal', 'snai', 'lottomatica', 'cplay'];
+    const menu = document.createElement('div');
+    menu.appendChild(header);
+    menu.className = 'update-menu overlay';
+    menu.style.display = 'none';
+
+
+    for (let i = 0; i < sites.length; i += 2) {
+        const row = document.createElement('div');
+        row.className = 'menu-row';
+
+        for (let j = i; j < Math.min(i + 2, sites.length); j++) {
+            const site = sites[j];
+            const item = document.createElement('div');
+            item.className = 'menu-item';
+
+            const img = document.createElement('img');
+            img.src = siteImages[site];
+            img.alt = `Update ${site}`;
+            img.title = `Update ${site}`;
+
+            item.appendChild(img);
+            item.addEventListener('click', () => {
+                updateSiteBets(site);
+                toggleMenu();
+            });
+            row.appendChild(item);
+        }
+
+        menu.appendChild(row);
+    }
+
+    return menu;
 }
 
 function showBetHistory() {
     const removedBets = loadRemovedBetsFromLocalStorage();
     const historyModal = createBetHistoryModal(removedBets);
     document.body.appendChild(historyModal);
+}
+
+function toggleMenu() {
+    const menu = document.querySelector('.update-menu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
 }
 
 function createBetHistoryModal(history) {
@@ -116,19 +185,6 @@ function manualCleanupRemovedBets() {
     }
 }
 
-
-function createHeader() {
-    const header = document.createElement('div');
-    header.className = 'active-bets-header';
-    const fetchButton = createButton('fetch-bets-button', 'fa-play', fetchActiveBets);
-    const refreshButton = createButton('refresh-bets-button', 'fa-sync-alt', refreshAllBets);
-    const menuButton = createButton('menu-button', 'fa-ellipsis-v', toggleMenu);
-    header.appendChild(fetchButton);
-    header.appendChild(refreshButton);
-    header.appendChild(menuButton);
-    return header;
-}
-
 function createButton(id, iconClass, onClick) {
     const button = document.createElement('button');
     button.id = id;
@@ -138,63 +194,6 @@ function createButton(id, iconClass, onClick) {
     button.addEventListener('click', onClick);
     return button;
 }
-function createBetList() {
-    const betList = document.createElement('div');
-    betList.className = 'bet-list';
-    return betList;
-}
-function createMenu() {
-    const header = document.createElement('div');
-    header.className = 'update-menu-header';
-
-    const titleText = document.createElement('h1');
-    titleText.textContent = 'Aggiorna Bets';
-    titleText.className = 'update-menu-title';
-
-    header.appendChild(titleText);
-
-    const sites = ['goldbet', 'bet365', 'eurobet', 'sisal', 'snai', 'lottomatica', 'cplay'];
-    const menu = document.createElement('div');
-    menu.appendChild(header);
-    menu.className = 'update-menu overlay';
-    menu.style.display = 'none';
-
-
-    for (let i = 0; i < sites.length; i += 2) {
-        const row = document.createElement('div');
-        row.className = 'menu-row';
-
-        for (let j = i; j < Math.min(i + 2, sites.length); j++) {
-            const site = sites[j];
-            const item = document.createElement('div');
-            item.className = 'menu-item';
-
-            const img = document.createElement('img');
-            img.src = siteImages[site];
-            img.alt = `Update ${site}`;
-            img.title = `Update ${site}`;
-
-            item.appendChild(img);
-            item.addEventListener('click', () => {
-                updateSiteBets(site);
-                toggleMenu();
-            });
-            row.appendChild(item);
-        }
-
-        menu.appendChild(row);
-    }
-
-    return menu;
-}
-
-
-function toggleMenu() {
-    const menu = document.querySelector('.update-menu');
-    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-}
-
-let removedBets = {};
 
 export function renderBetList(bets, container) {
     container.innerHTML = '';
@@ -214,7 +213,6 @@ export function renderBetList(bets, container) {
         showNoBetsMessage(container);
     }
 }
-
 
 function createBetPreview(site, bet) {
     const preview = document.createElement('div');

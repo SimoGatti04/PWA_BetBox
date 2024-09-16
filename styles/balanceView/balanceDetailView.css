@@ -132,14 +132,16 @@
 
 .balance-detail-screen .background-image {
     position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    top: 0rem;
+    right: 0rem;
+    bottom: 0rem;
+    left: 0rem;
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 70rem;
+    background-size: 54rem;
     opacity: 0.2;
+    width: 25rem;
+    height: 44rem;
 }
 
 .balance-detail-screen .detail-content {
@@ -148,3 +150,47 @@
     padding: 20px;
 }
 
+@media (min-width: 600px) {
+
+    .balance-detail-screen .background-image {
+        position: absolute;
+        top: 0rem;
+        right: 0rem;
+        bottom: 0;
+        left: 0rem;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 62rem;
+        opacity: 0.2;
+        width: 44rem;
+        height: 44rem;
+    }
+
+    .play-button {
+        position: absolute;
+        background: none;
+        border: none;
+        color: #0a84ff;
+        font-size: 2.5rem;
+        cursor: pointer;
+        top: 5.85rem;
+        left: 0rem;
+        height: 2rem;
+        width: 2rem;
+    }
+
+    .refresh-button {
+        position: absolute;
+        top: 5.65rem;
+        right: -0.2rem;
+        background: none;
+        border: none;
+        color: #0a84ff;
+        font-size: 2.5rem;
+        cursor: pointer;
+    }
+}
+
+@media (min-width: 1300px){
+
+}

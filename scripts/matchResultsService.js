@@ -29,8 +29,10 @@ function needsFetching(event, now) {
     const { matchResult } = event;
     if (!matchResult) return true;
     if (matchResult.status === 'FINISHED') return false;
-    if (matchResult.status === 'IN_PLAY' && now - matchResult.lastUpdated < 5 * 60 * 1000) return false;
-    return true;
+    return !((matchResult.status === 'IN_PLAY' ||
+            matchResult.status === 'PAUSED' ||
+            matchResult.status === 'LIVE')
+        && now - matchResult.lastUpdated < 60 * 1000);
 }
 
 async function getResultsFromFootballData(events) {

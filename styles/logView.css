@@ -109,3 +109,18 @@
 .log-method { width: 60px; }
 .log-status { width: 65px; }
 .log-endpoint { width: calc(100% - 260px); }
+
+
+@media (min-width: 600px) {
+
+    .clear-log-button {
+        background: none;
+        border: none;
+        color: #0a84ff;
+        font-size: 2rem;
+        cursor: pointer;
+        position: relative;
+        right: -0.5rem;
+    }
+
+}

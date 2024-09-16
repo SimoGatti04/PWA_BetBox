@@ -195,3 +195,39 @@
     text-align: center;
     padding-bottom: 0.3rem;
 }
+
+@media (min-width: 600px) {
+
+    #fetch-bets-button {
+        position: absolute;
+        background: none;
+        border: none;
+        color: #0a84ff;
+        font-size: 2rem;
+        cursor: pointer;
+        right: 7.3rem;
+        top: 1.5rem;
+    }
+
+    #refresh-bets-button {
+        position: absolute;
+        background: none;
+        border: none;
+        color: #0a84ff;
+        font-size: 2rem;
+        cursor: pointer;
+        right: 3.5rem;
+        top: 1.5rem;
+    }
+
+    #menu-button {
+        position: absolute;
+        background: none;
+        border: none;
+        color: #0a84ff;
+        font-size: 2rem;
+        cursor: pointer;
+        right: 1rem;
+        top: 1.5rem;
+    }
+}
