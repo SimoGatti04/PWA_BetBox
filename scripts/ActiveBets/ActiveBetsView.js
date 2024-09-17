@@ -238,4 +238,22 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
+let abortController;
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        // L'app sta andando in background
+        if (abortController) {
+            abortController.abort(); // Annulla tutte le richieste in corso
+            abortController = null;
+        }
+    } else {
+        // L'app sta tornando in primo piano
+        abortController = new AbortController();
+        const savedBets = loadBetsFromLocalStorage();
+        const betList = document.querySelector('.bet-list');
+        updateMatchResultsIfNeeded(savedBets, betList);
+    }
+});
+
 

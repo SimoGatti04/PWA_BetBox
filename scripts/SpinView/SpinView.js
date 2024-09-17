@@ -62,57 +62,63 @@ function loadSpinHistory() {
 
 // Modify the fetchSpinHistory function
 async function fetchSpinHistory() {
-  const sites = ['goldbet', 'lottomatica', 'snai'];
-  for (const site of sites) {
-    if (fetchingStatus[site]) {
-      console.log(`Richiesta per il sito ${site} già in corso, evitando duplicati.`);
-      continue;
+    const sites = ['goldbet', 'lottomatica', 'snai'];
+    for (const site of sites) {
+        if (fetchingStatus[site]) continue;
+
+        fetchingStatus[site] = true;
+
+        try {
+            const response = await fetch(`${config.apiBaseUrl}/spin-history/${site}`, {
+                headers: {
+                    'ngrok-skip-browser-warning': 'true',
+                },
+                signal: abortController.signal
+            });
+            const data = await response.json();
+            bonusHistory[site] = data;
+            updateSpinBox(site, data);
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log(`Richiesta per ${site} annullata`);
+            } else {
+                console.error(`Error fetching spin history for ${site}:`, error);
+            }
+        } finally {
+            fetchingStatus[site] = false;
+        }
     }
+    saveSpinHistory(bonusHistory);
+}
+
+
+function performSpin(site) {
+    if (fetchingStatus[site]) return;
 
     fetchingStatus[site] = true;
 
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/spin-history/${site}`, {
+    fetch(`${config.apiBaseUrl}/spin/${site}`, {
+        method: 'POST',
         headers: {
-          'ngrok-skip-browser-warning': 'true',
-        }
-      });
-      const data = await response.json();
-      bonusHistory[site] = data;
-      updateSpinBox(site, data);
-    } catch (error) {
-      console.error(`Error fetching spin history for ${site}:`, error);
-    } finally {
-      fetchingStatus[site] = false;
-    }
-  }
-  saveSpinHistory(bonusHistory);
-}
-
-// Modify the performSpin function
-function performSpin(site) {
-  if (fetchingStatus[site]) {
-    console.log(`Richiesta per il sito ${site} già in corso, evitando duplicati.`);
-    return;
-  }
-
-  fetchingStatus[site] = true;
-
-  fetch(`${config.apiBaseUrl}/spin/${site}`, {
-    method: 'POST',
-    headers: {
-      'ngrok-skip-browser-warning': 'true'
-    }
-  })
-    .then(response => response.json())
-    .then(result => {
-      console.log(`Spin result for ${site}:`, result);
-      return fetchSpinHistory();
+            'ngrok-skip-browser-warning': 'true'
+        },
+        signal: abortController.signal
     })
-    .catch(error => console.error(`Error performing spin for ${site}:`, error))
-    .finally(() => {
-      fetchingStatus[site] = false;
-    });
+        .then(response => response.json())
+        .then(result => {
+            console.log(`Spin result for ${site}:`, result);
+            return fetchSpinHistory();
+        })
+        .catch(error => {
+            if (error.name === 'AbortError') {
+                console.log(`Richiesta di spin per ${site} annullata`);
+            } else {
+                console.error(`Error performing spin for ${site}:`, error);
+            }
+        })
+        .finally(() => {
+            fetchingStatus[site] = false;
+        });
 }
 
 
@@ -167,5 +173,19 @@ function formatDate(dateString) {
     minute: '2-digit'
   });
 }
+
+let abortController;
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        if (abortController) {
+            abortController.abort();
+            abortController = null;
+        }
+        fetchingStatus = {}; // Resetta lo stato di fetching
+    } else {
+        abortController = new AbortController();
+    }
+});
 
 
