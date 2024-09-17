@@ -10,6 +10,7 @@ import { showBetDetails } from './BetDetailView.js';
 import { formatDate, getStatusColor, showNoBetsMessage } from "./ActiveBetsUtils.js";
 
 let removedBets = {};
+export let abortController;
 
 export function createActiveBetsView() {
     const view = document.createElement('div');
@@ -237,8 +238,6 @@ document.addEventListener('visibilitychange', () => {
         updateMatchResultsIfNeeded(savedBets, betList);
     }
 });
-
-let abortController;
 
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {

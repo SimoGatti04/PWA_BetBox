@@ -8,6 +8,7 @@ import {
 } from "./BetStorageService.js";
 import { renderBetList } from "./ActiveBetsView.js";
 import { getRomeTime } from '../utils.js';
+import { abortController } from './ActiveBetsView.js'
 
 export const BET_UPDATED_EVENT = 'betUpdated';
 
@@ -19,7 +20,8 @@ export async function recoverActiveBets() {
             headers: {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
-            }
+            },
+            signal: abortController ? abortController.signal : null
         });
         const result = await response.json();
         console.log('Scommesse attive recuperate:', result);
@@ -39,7 +41,8 @@ export async function refreshAllBets() {
                 'Content-Type': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
             },
-            body: JSON.stringify({ appBets: savedBets })
+            body: JSON.stringify({ appBets: savedBets }),
+            signal: abortController ? abortController.signal : null
         });
         const comparison = await response.json();
         const updatedBets = mergeServerAndLocalBets(savedBets, comparison);
@@ -61,7 +64,8 @@ export async function updateSiteBets(site) {
             headers: {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
-            }
+            },
+            signal: abortController ? abortController.signal : null
         });
         const result = await response.json();
         console.log(`Active bets updated for ${site}:`, result);
@@ -198,5 +202,21 @@ document.addEventListener(BET_UPDATED_EVENT, (event) => {
         if (updatedBet) {
             updateBetDetailView(updatedBet, openBetDetail);
         }
+    }
+});
+
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        // L'app sta andando in background
+        if (abortController) {
+            abortController.abort(); // Annulla tutte le richieste in corso
+            abortController = null;
+        }
+    } else {
+        // L'app sta tornando in primo piano
+        abortController = new AbortController();
+        const savedBets = loadBetsFromLocalStorage();
+        const betList = document.querySelector('.bet-list');
+        updateMatchResultsIfNeeded(savedBets, betList);
     }
 });
