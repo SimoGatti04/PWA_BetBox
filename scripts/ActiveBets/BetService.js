@@ -12,6 +12,10 @@ import { abortControllerWrapper } from './ActiveBetsView.js'
 
 export const BET_UPDATED_EVENT = 'betUpdated';
 
+function getSignal() {
+    return abortControllerWrapper.controller ? abortControllerWrapper.controller.signal : null;
+}
+
 export async function recoverActiveBets() {
     try {
         const response = await fetch(`${config.apiBaseUrl}/bets/fetch-active-bets`, {
@@ -20,7 +24,7 @@ export async function recoverActiveBets() {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
             },
-            signal: abortControllerWrapper.controller ? abortControllerWrapper.controller.signal : null
+            signal: getSignal()
         });
         const result = await response.json();
         console.log('Scommesse attive recuperate:', result);
@@ -41,7 +45,7 @@ export async function refreshAllBets() {
                 'ngrok-skip-browser-warning': '69420'
             },
             body: JSON.stringify({ appBets: savedBets }),
-            signal: abortControllerWrapper.controller ? abortControllerWrapper.controller.signal : null
+            signal: getSignal()
         });
         const comparison = await response.json();
         const updatedBets = mergeServerAndLocalBets(savedBets, comparison);
@@ -64,7 +68,7 @@ export async function updateSiteBets(site) {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
             },
-            signal: abortControllerWrapper.controller ? abortControllerWrapper.controller.signal : null
+            signal: getSignal()
         });
         const result = await response.json();
         console.log(`Active bets updated for ${site}:`, result);
@@ -201,21 +205,5 @@ document.addEventListener(BET_UPDATED_EVENT, (event) => {
         if (updatedBet) {
             updateBetDetailView(updatedBet, openBetDetail);
         }
-    }
-});
-
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        // L'app sta andando in background
-        if (abortControllerWrapper.controller) {
-            abortControllerWrapper.controller.abort(); // Annulla tutte le richieste in corso
-            abortControllerWrapper.controller = null;
-        }
-    } else {
-        // L'app sta tornando in primo piano
-        abortControllerWrapper.controller = new AbortController();
-        const savedBets = loadBetsFromLocalStorage();
-        const betList = document.querySelector('.bet-list');
-        updateMatchResultsIfNeeded(savedBets, betList);
     }
 });

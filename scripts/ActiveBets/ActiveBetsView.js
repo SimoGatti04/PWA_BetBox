@@ -248,8 +248,13 @@ function handleVisibilityChange() {
     if (document.hidden) {
         abortCurrentRequests();
     } else {
+        initializeAbortController();
         refreshBets();
     }
+}
+
+function initializeAbortController() {
+    abortControllerWrapper.controller = new AbortController();
 }
 
 function handlePageHide() {
