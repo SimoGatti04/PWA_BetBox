@@ -11,6 +11,9 @@ import { formatDate, getStatusColor, showNoBetsMessage } from "./ActiveBetsUtils
 
 let removedBets = {};
 export let abortController;
+document.addEventListener('visibilitychange', handleVisibilityChange);
+window.addEventListener('pagehide', handlePageHide);
+window.addEventListener('pageshow', handlePageShow);
 
 export function createActiveBetsView() {
     const view = document.createElement('div');
@@ -239,20 +242,42 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-document.addEventListener('visibilitychange', () => {
+function handleVisibilityChange() {
     if (document.hidden) {
-        // L'app sta andando in background
-        if (abortController) {
-            abortController.abort(); // Annulla tutte le richieste in corso
-            abortController = null;
-        }
+        abortCurrentRequests();
     } else {
-        // L'app sta tornando in primo piano
-        abortController = new AbortController();
-        const savedBets = loadBetsFromLocalStorage();
-        const betList = document.querySelector('.bet-list');
-        updateMatchResultsIfNeeded(savedBets, betList);
+        initializeAbortController();
+        refreshBets();
     }
-});
+}
+
+function handlePageHide() {
+    abortCurrentRequests();
+}
+
+function handlePageShow(event) {
+    if (event.persisted) {
+        initializeAbortController();
+        refreshBets();
+    }
+}
+
+function abortCurrentRequests() {
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
+}
+
+function initializeAbortController() {
+    abortController = new AbortController();
+}
+
+function refreshBets() {
+    const savedBets = loadBetsFromLocalStorage();
+    const betList = document.querySelector('.bet-list');
+    updateMatchResultsIfNeeded(savedBets, betList);
+}
+
 
 

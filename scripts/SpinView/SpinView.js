@@ -6,7 +6,7 @@ import config from "../../config.js";
 // Replace the global isFetching variable with an object
 let fetchingStatus = {};
 let bonusHistory = loadSpinHistory();
-
+let abortController = new AbortController();
 
 export function createSpinView() {
   console.log(new Date(getRomeTime()));
@@ -46,6 +46,14 @@ export function createSpinView() {
   if (shouldFetch) {
     fetchSpinHistory().catch(error => console.error('Error fetching spin history:', error));
   }
+
+  checkAndFetchMissingBonuses();
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            checkAndFetchMissingBonuses();
+        }
+    });
 
   return view;
 }
@@ -107,7 +115,10 @@ function performSpin(site) {
         .then(response => response.json())
         .then(result => {
             console.log(`Spin result for ${site}:`, result);
-            return fetchSpinHistory();
+            bonusHistory[site] = bonusHistory[site] || [];
+            bonusHistory[site].push(result);
+            updateSpinBox(site, bonusHistory[site]);
+            saveSpinHistory(bonusHistory);
         })
         .catch(error => {
             if (error.name === 'AbortError') {
@@ -121,6 +132,25 @@ function performSpin(site) {
         });
 }
 
+function checkAndFetchMissingBonuses() {
+    const today = new Date(getRomeTime()).toISOString().split('T')[0];
+    const sites = ['goldbet', 'lottomatica', 'snai'];
+
+    sites.forEach(site => {
+        const lastBonus = bonusHistory[site] && bonusHistory[site].find(bonus => {
+            if(bonus.result != null){
+                const isToday = bonus.date.split('T')[0] === today;
+                const isValidBonus = bonus.result.tipo !== 'Nullo' && bonus.result.tipo !== 'N/A' && bonus.result.tipo !== null;
+                return isToday && isValidBonus;
+            }
+            return false;
+        });
+
+        if (!lastBonus) {
+            fetchSpinHistory(site);
+        }
+    });
+}
 
 function updateSpinBox(site, spinHistory) {
   const spinBox = document.querySelector(`.spin-box[data-site="${site}"]`);
@@ -173,8 +203,6 @@ function formatDate(dateString) {
     minute: '2-digit'
   });
 }
-
-let abortController;
 
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
