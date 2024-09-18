@@ -2,7 +2,7 @@
     position: absolute;
     background: none;
     border: none;
-    color: #0a84ff;
+    color: yellow;
     font-size: 2rem;
     cursor: pointer;
     right:5.3rem;
@@ -202,7 +202,7 @@
         position: absolute;
         background: none;
         border: none;
-        color: green;
+        color: #0a84ff;
         font-size: 2rem;
         cursor: pointer;
         right: 7.3rem;

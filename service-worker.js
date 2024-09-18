@@ -18,19 +18,29 @@ const API_HOSTS = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
-  );
+  if (config.isPWATestMode) {
+    event.waitUntil(
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+      })
+    );
+  } else {
+    event.waitUntil(
+      caches.open(CACHE_NAME)
+        .then((cache) => cache.addAll(urlsToCache))
+    );
+  }
 });
 
 self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+
   if (config.isPWATestMode) {
-    event.waitUntil(
-      setInterval(() => {
-        self.registration.update();
-      }, 30000)
-    );
+    setInterval(() => {
+      self.registration.update();
+    }, 30000);
   }
 });
 
