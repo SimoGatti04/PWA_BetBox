@@ -10,7 +10,9 @@ import { showBetDetails } from './BetDetailView.js';
 import { formatDate, getStatusColor, showNoBetsMessage } from "./ActiveBetsUtils.js";
 
 let removedBets = {};
-export let abortController = new AbortController();
+export const abortControllerWrapper = {
+    controller: new AbortController()
+};
 document.addEventListener('visibilitychange', handleVisibilityChange);
 window.addEventListener('pagehide', handlePageHide);
 window.addEventListener('pageshow', handlePageShow);
@@ -261,9 +263,9 @@ function handlePageShow(event) {
 }
 
 function abortCurrentRequests() {
-    if (abortController) {
-        abortController.abort();
-        abortController = null;
+    if (abortControllerWrapper.controller) {
+        abortControllerWrapper.controller.abort();
+        abortControllerWrapper.controller = null;
     }
 }
 

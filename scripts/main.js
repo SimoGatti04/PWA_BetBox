@@ -2,9 +2,9 @@ import { createBalanceView, fetchAllRecentBalances } from './BalanceView/Balance
 import { createSpinView } from './SpinView/SpinView.js';
 import { createActiveBetsView } from './ActiveBets/ActiveBetsView.js';
 import { createLogView } from './ApiLogs/LogView.js';
-import config from '../config.js';
+import isPWATestMode from '../service-worker.js';
 
-if (config.isPWATestMode && 'serviceWorker' in navigator) {
+if (isPWATestMode && 'serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
     for (let registration of registrations) {
       registration.update();

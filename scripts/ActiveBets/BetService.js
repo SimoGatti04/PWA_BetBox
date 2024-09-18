@@ -8,10 +8,9 @@ import {
 } from "./BetStorageService.js";
 import { renderBetList } from "./ActiveBetsView.js";
 import { getRomeTime } from '../utils.js';
-import { abortController } from './ActiveBetsView.js'
+import { abortControllerWrapper } from './ActiveBetsView.js'
 
 export const BET_UPDATED_EVENT = 'betUpdated';
-
 
 export async function recoverActiveBets() {
     try {
@@ -21,7 +20,7 @@ export async function recoverActiveBets() {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
             },
-            signal: abortController ? abortController.signal : null
+            signal: abortControllerWrapper.controller ? abortControllerWrapper.controller.signal : null
         });
         const result = await response.json();
         console.log('Scommesse attive recuperate:', result);
@@ -42,7 +41,7 @@ export async function refreshAllBets() {
                 'ngrok-skip-browser-warning': '69420'
             },
             body: JSON.stringify({ appBets: savedBets }),
-            signal: abortController ? abortController.signal : null
+            signal: abortControllerWrapper.controller ? abortControllerWrapper.controller.signal : null
         });
         const comparison = await response.json();
         const updatedBets = mergeServerAndLocalBets(savedBets, comparison);
@@ -65,7 +64,7 @@ export async function updateSiteBets(site) {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
             },
-            signal: abortController ? abortController.signal : null
+            signal: abortControllerWrapper.controller ? abortControllerWrapper.controller.signal : null
         });
         const result = await response.json();
         console.log(`Active bets updated for ${site}:`, result);
@@ -208,13 +207,13 @@ document.addEventListener(BET_UPDATED_EVENT, (event) => {
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
         // L'app sta andando in background
-        if (abortController) {
-            abortController.abort(); // Annulla tutte le richieste in corso
-            abortController = null;
+        if (abortControllerWrapper.controller) {
+            abortControllerWrapper.controller.abort(); // Annulla tutte le richieste in corso
+            abortControllerWrapper.controller = null;
         }
     } else {
         // L'app sta tornando in primo piano
-        abortController = new AbortController();
+        abortControllerWrapper.controller = new AbortController();
         const savedBets = loadBetsFromLocalStorage();
         const betList = document.querySelector('.bet-list');
         updateMatchResultsIfNeeded(savedBets, betList);
