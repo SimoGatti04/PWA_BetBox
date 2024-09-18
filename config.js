@@ -1,5 +1,6 @@
 const isTestMode = false;
 const isiPhoneDebug = false;
+export const isPWATestMode = true;
 
 let apiBaseUrl;
 
@@ -12,7 +13,8 @@ if (!isTestMode) {
 }
 
 const config = {
-    apiBaseUrl: apiBaseUrl
+    apiBaseUrl: apiBaseUrl,
+    isPWATestMode: isPWATestMode
 };
 
 export default config;

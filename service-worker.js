@@ -1,3 +1,5 @@
+import config from './config.js';
+
 const CACHE_NAME = 'betbox-cache-v1';
 const urlsToCache = [
   '/',
@@ -15,21 +17,28 @@ const API_HOSTS = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
-  );
+  if (config.isPWATestMode) {
+    event.waitUntil(
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => caches.delete(cacheName))
+        );
+      })
+    );
+  } else {
+    event.waitUntil(
+      caches.open(CACHE_NAME)
+        .then((cache) => cache.addAll(urlsToCache))
+    );
+  }
 });
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Controlla se la richiesta è per l'API
-  if (API_HOSTS.includes(url.origin)) {
-    // Per le richieste API, vai direttamente alla rete senza controllare la cache
+  if (config.isPWATestMode || API_HOSTS.includes(url.origin)) {
     event.respondWith(fetch(event.request));
   } else {
-    // Per le altre richieste, usa la strategia cache-first
     event.respondWith(
       caches.match(event.request)
         .then((response) => {
@@ -38,7 +47,6 @@ self.addEventListener('fetch', (event) => {
           }
           return fetch(event.request).then(
             (response) => {
-              // Opzionale: memorizza nella cache la nuova risorsa se è una GET
               if (event.request.method === 'GET') {
                 let responseToCache = response.clone();
                 caches.open(CACHE_NAME)
