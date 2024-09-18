@@ -2,16 +2,6 @@ import { createBalanceView, fetchAllRecentBalances } from './BalanceView/Balance
 import { createSpinView } from './SpinView/SpinView.js';
 import { createActiveBetsView } from './ActiveBets/ActiveBetsView.js';
 import { createLogView } from './ApiLogs/LogView.js';
-import isPWATestMode from '../service-worker.js';
-
-if (isPWATestMode && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then((registrations) => {
-    for (let registration of registrations) {
-      registration.update();
-    }
-  });
-}
-
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.getElementById('root');

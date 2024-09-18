@@ -1,4 +1,6 @@
-const isPWATestMode = true;
+const config = {
+  isPWATestMode: true // o false, a seconda delle tue esigenze
+};
 const CACHE_NAME = 'betbox-cache-v1';
 const urlsToCache = [
   '/',
@@ -17,7 +19,7 @@ const API_HOSTS = [
 ];
 
 self.addEventListener('install', (event) => {
-  if (isPWATestMode) {
+  if (config.isPWATestMode) {
     event.waitUntil(
       caches.keys().then(cacheNames => {
         return Promise.all(
@@ -36,7 +38,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 
-  if (isPWATestMode) {
+  if (config.isPWATestMode) {
     setInterval(() => {
       self.registration.update();
     }, 30000);
@@ -46,7 +48,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  if (isPWATestMode || API_HOSTS.includes(url.origin)) {
+  if (config.isPWATestMode || API_HOSTS.includes(url.origin)) {
     event.respondWith(fetch(event.request));
   } else {
     event.respondWith(

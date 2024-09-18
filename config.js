@@ -12,7 +12,7 @@ if (!isTestMode) {
 }
 
 const config = {
-    apiBaseUrl: apiBaseUrl,
+    apiBaseUrl: apiBaseUrl
 };
 
 export default config;
