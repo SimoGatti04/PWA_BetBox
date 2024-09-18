@@ -1,5 +1,5 @@
-const isTestMode = false;
-const isiPhoneDebug = false;
+const isTestMode = true;
+const isiPhoneDebug = true;
 export const isPWATestMode = true;
 
 let apiBaseUrl;
