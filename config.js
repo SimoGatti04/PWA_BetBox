@@ -1,6 +1,6 @@
 const isTestMode = true;
 const isiPhoneDebug = true;
-export const isPWATestMode = true;
+const isPWATestMode = true;
 
 let apiBaseUrl;
 

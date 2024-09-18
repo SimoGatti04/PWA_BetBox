@@ -13,22 +13,23 @@ const urlsToCache = [
 
 const API_HOSTS = [
   'https://legally-modest-joey.ngrok-free.app',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://192.168.0.58:3000'
 ];
 
 self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(urlsToCache))
+  );
+});
+
+self.addEventListener('activate', (event) => {
   if (config.isPWATestMode) {
     event.waitUntil(
-      caches.keys().then((cacheNames) => {
-        return Promise.all(
-          cacheNames.map((cacheName) => caches.delete(cacheName))
-        );
-      })
-    );
-  } else {
-    event.waitUntil(
-      caches.open(CACHE_NAME)
-        .then((cache) => cache.addAll(urlsToCache))
+      setInterval(() => {
+        self.registration.update();
+      }, 30000)
     );
   }
 });
