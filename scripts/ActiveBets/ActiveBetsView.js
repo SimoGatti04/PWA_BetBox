@@ -232,20 +232,3 @@ function createBetPreview(site, bet) {
     preview.addEventListener('click', () => showBetDetails(bet, true));
     return preview;
 }
-
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-        abortCurrentRequests();
-    } else {
-        abortControllerWrapper.controller = new AbortController();
-    }
-});
-
-function abortCurrentRequests() {
-    if (abortControllerWrapper.controller) {
-        abortControllerWrapper.controller.abort();
-        abortControllerWrapper.controller = null;
-    }
-}
-
-

@@ -3,10 +3,8 @@ import { createBonusLogModal } from '../BonusLogModal.js';
 import { getRomeTime } from '../utils.js';
 import config from "../../config.js";
 
-// Replace the global isFetching variable with an object
 let fetchingStatus = {};
 let bonusHistory = loadSpinHistory();
-let abortController = new AbortController();
 
 export function createSpinView() {
   console.log(new Date(getRomeTime()));
@@ -81,17 +79,12 @@ async function fetchSpinHistory() {
                 headers: {
                     'ngrok-skip-browser-warning': 'true',
                 },
-                signal: abortController.signal
             });
             const data = await response.json();
             bonusHistory[site] = data;
             updateSpinBox(site, data);
         } catch (error) {
-            if (error.name === 'AbortError') {
-                console.log(`Richiesta per ${site} annullata`);
-            } else {
-                console.error(`Error fetching spin history for ${site}:`, error);
-            }
+            console.error(`Error fetching spin history for ${site}:`, error);
         } finally {
             fetchingStatus[site] = false;
         }
@@ -110,7 +103,6 @@ function performSpin(site) {
         headers: {
             'ngrok-skip-browser-warning': 'true'
         },
-        signal: abortController.signal
     })
         .then(response => response.json())
         .then(result => {
@@ -121,11 +113,7 @@ function performSpin(site) {
             saveSpinHistory(bonusHistory);
         })
         .catch(error => {
-            if (error.name === 'AbortError') {
-                console.log(`Richiesta di spin per ${site} annullata`);
-            } else {
-                console.error(`Error performing spin for ${site}:`, error);
-            }
+            console.error(`Error performing spin for ${site}:`, error);
         })
         .finally(() => {
             fetchingStatus[site] = false;
@@ -204,16 +192,5 @@ function formatDate(dateString) {
   });
 }
 
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        if (abortController) {
-            abortController.abort();
-            abortController = null;
-        }
-        fetchingStatus = {}; // Resetta lo stato di fetching
-    } else {
-        abortController = new AbortController();
-    }
-});
 
 

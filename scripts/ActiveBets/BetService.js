@@ -8,13 +8,8 @@ import {
 } from "./BetStorageService.js";
 import { renderBetList } from "./ActiveBetsView.js";
 import { getRomeTime } from '../utils.js';
-import { abortControllerWrapper } from './ActiveBetsView.js'
 
 export const BET_UPDATED_EVENT = 'betUpdated';
-
-function getSignal() {
-    return abortControllerWrapper.controller ? abortControllerWrapper.controller.signal : null;
-}
 
 export async function recoverActiveBets() {
     try {
@@ -24,11 +19,9 @@ export async function recoverActiveBets() {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
             },
-            signal: getSignal()
         });
         const result = await response.json();
         console.log('Scommesse attive recuperate:', result);
-        await refreshAllBets();
     } catch (error) {
         console.error('Errore nel recupero delle scommesse attive:', error);
     }
@@ -45,7 +38,6 @@ export async function refreshAllBets() {
                 'ngrok-skip-browser-warning': '69420'
             },
             body: JSON.stringify({ appBets: savedBets }),
-            signal: getSignal()
         });
         const comparison = await response.json();
         const updatedBets = mergeServerAndLocalBets(savedBets, comparison);
@@ -68,7 +60,6 @@ export async function updateSiteBets(site) {
                 'Accept': 'application/json',
                 'ngrok-skip-browser-warning': '69420'
             },
-            signal: getSignal()
         });
         const result = await response.json();
         console.log(`Active bets updated for ${site}:`, result);
