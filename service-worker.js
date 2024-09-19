@@ -1,6 +1,3 @@
-const config = {
-  isPWATestMode: true // o false, a seconda delle tue esigenze
-};
 const CACHE_NAME = 'betbox-cache-v1';
 const urlsToCache = [
   '/',
@@ -14,43 +11,24 @@ const urlsToCache = [
 
 const API_HOSTS = [
   'https://legally-modest-joey.ngrok-free.app',
-  'http://localhost:3000',
-  'http://192.168.0.58:3000'
+  'http://localhost:3000'
 ];
-
 self.addEventListener('install', (event) => {
-  if (config.isPWATestMode) {
-    event.waitUntil(
-      caches.keys().then(cacheNames => {
-        return Promise.all(
-          cacheNames.map(cacheName => caches.delete(cacheName))
-        );
-      })
-    );
-  } else {
-    event.waitUntil(
-      caches.open(CACHE_NAME)
-        .then((cache) => cache.addAll(urlsToCache))
-    );
-  }
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
-
-  if (config.isPWATestMode) {
-    setInterval(() => {
-      self.registration.update();
-    }, 30000);
-  }
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(urlsToCache))
+  );
 });
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  if (config.isPWATestMode || API_HOSTS.includes(url.origin)) {
+  // Controlla se la richiesta è per l'API
+  if (API_HOSTS.includes(url.origin)) {
+    // Per le richieste API, vai direttamente alla rete senza controllare la cache
     event.respondWith(fetch(event.request));
   } else {
+    // Per le altre richieste, usa la strategia cache-first
     event.respondWith(
       caches.match(event.request)
         .then((response) => {
@@ -59,6 +37,7 @@ self.addEventListener('fetch', (event) => {
           }
           return fetch(event.request).then(
             (response) => {
+              // Opzionale: memorizza nella cache la nuova risorsa se è una GET
               if (event.request.method === 'GET') {
                 let responseToCache = response.clone();
                 caches.open(CACHE_NAME)

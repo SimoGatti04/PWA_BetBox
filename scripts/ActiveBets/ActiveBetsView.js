@@ -13,9 +13,6 @@ let removedBets = {};
 export const abortControllerWrapper = {
     controller: new AbortController()
 };
-document.addEventListener('visibilitychange', handleVisibilityChange);
-window.addEventListener('pagehide', handlePageHide);
-window.addEventListener('pageshow', handlePageShow);
 
 export function createActiveBetsView() {
     const view = document.createElement('div');
@@ -241,20 +238,25 @@ document.addEventListener('visibilitychange', () => {
         const savedBets = loadBetsFromLocalStorage();
         const betList = document.querySelector('.bet-list');
         updateMatchResultsIfNeeded(savedBets, betList);
+    } else {
+        handleVisibilityChange();
     }
+});
+
+document.addEventListener('pagehide', () => {
+    handlePageHide();
+});
+document.addEventListener('pageshow', () => {
+    handlePageShow();
 });
 
 function handleVisibilityChange() {
     if (document.hidden) {
         abortCurrentRequests();
     } else {
-        initializeAbortController();
+        abortControllerWrapper.controller = new AbortController();
         refreshBets();
     }
-}
-
-function initializeAbortController() {
-    abortControllerWrapper.controller = new AbortController();
 }
 
 function handlePageHide() {
