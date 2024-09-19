@@ -235,6 +235,7 @@ function createBetPreview(site, bet) {
 
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
+        abortCurrentRequests();
         const savedBets = loadBetsFromLocalStorage();
         const betList = document.querySelector('.bet-list');
         updateMatchResultsIfNeeded(savedBets, betList);
