@@ -234,54 +234,15 @@ function createBetPreview(site, bet) {
 }
 
 document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) {
-        abortCurrentRequests();
-        const savedBets = loadBetsFromLocalStorage();
-        const betList = document.querySelector('.bet-list');
-        updateMatchResultsIfNeeded(savedBets, betList);
-    } else {
-        handleVisibilityChange();
-    }
-});
-
-document.addEventListener('pagehide', () => {
-    handlePageHide();
-});
-document.addEventListener('pageshow', () => {
-    handlePageShow();
-});
-
-function handleVisibilityChange() {
     if (document.hidden) {
-        abortCurrentRequests();
+        if (abortControllerWrapper.controller) {
+            abortControllerWrapper.controller.abort();
+            abortControllerWrapper.controller = null;
+        }
+        //fetchingStatus = {}; // Resetta lo stato di fetching
     } else {
         abortControllerWrapper.controller = new AbortController();
-        refreshBets();
     }
-}
-
-function handlePageHide() {
-    abortCurrentRequests();
-}
-
-function handlePageShow(event) {
-    if (event.persisted) {
-        refreshBets();
-    }
-}
-
-function abortCurrentRequests() {
-    if (abortControllerWrapper.controller) {
-        abortControllerWrapper.controller.abort();
-        abortControllerWrapper.controller = null;
-    }
-}
-
-function refreshBets() {
-    const savedBets = loadBetsFromLocalStorage();
-    const betList = document.querySelector('.bet-list');
-    updateMatchResultsIfNeeded(savedBets, betList);
-}
-
+});
 
 
