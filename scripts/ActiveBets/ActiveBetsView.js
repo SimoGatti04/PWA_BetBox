@@ -234,15 +234,18 @@ function createBetPreview(site, bet) {
 }
 
 document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        if (abortControllerWrapper.controller) {
-            abortControllerWrapper.controller.abort();
-            abortControllerWrapper.controller = null;
-        }
-        //fetchingStatus = {}; // Resetta lo stato di fetching
+    if (!document.hidden) {
+        abortCurrentRequests();
     } else {
         abortControllerWrapper.controller = new AbortController();
     }
 });
+
+function abortCurrentRequests() {
+    if (abortControllerWrapper.controller) {
+        abortControllerWrapper.controller.abort();
+        abortControllerWrapper.controller = null;
+    }
+}
 
 
