@@ -9,12 +9,21 @@ async function getMatchResult(events) {
     }
 
     try {
-        let results = await getResultsFromFootballData(eventsToFetch);
-        const remainingEvents = eventsToFetch.filter(e => !results[e.name]);
+        // First, try to get results from SportDevs API
+        let results = await getResultsFromFootballAPI(eventsToFetch);
+        let remainingEvents = eventsToFetch.filter(e => !results[e.name]);
 
+        // If there are any remaining events, try Football-Data API
         if (remainingEvents.length > 0) {
-            const fallbackResults = await getResultsFromFootballAPI(remainingEvents);
-            results = { ...results, ...fallbackResults };
+            const footballDataResults = await getResultsFromFootballData(remainingEvents);
+            results = { ...results, ...footballDataResults };
+            remainingEvents = remainingEvents.filter(e => !results[e.name]);
+        }
+
+        // If there are still remaining events, try Football API
+        if (remainingEvents.length > 0) {
+            const footballAPIResults = await getResultsFromSportDevs(remainingEvents);
+            results = { ...results, ...footballAPIResults };
         }
 
         updateEventResults(events, results, now);
@@ -33,6 +42,10 @@ function needsFetching(event, now) {
             matchResult.status === 'PAUSED' ||
             matchResult.status === 'LIVE')
         && now - matchResult.lastUpdated < 60 * 1000);
+}
+
+async function getResultsFromSportDevs(events) {
+    return await fetchResults(`${config.apiBaseUrl}/proxy/sportdevs/match-results`, events);
 }
 
 async function getResultsFromFootballData(events) {
