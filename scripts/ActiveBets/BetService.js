@@ -8,8 +8,12 @@ import {
 } from "./BetStorageService.js";
 import { renderBetList } from "./ActiveBetsView.js";
 import { getRomeTime } from '../utils.js';
+import {getStatusColor} from "./ActiveBetsUtils.js";
 
 export const BET_UPDATED_EVENT = 'betUpdated';
+export const LIVE_STATUSES = ['IN_PLAY', 'LIVE', 'PAUSED', 'HALFTIME', 'FIRST HALF', 'SECOND HALF'];
+export const UPCOMING_STATUSES = ['NOT STARTED', 'TIMED'];
+export const FINISHED_STATUSES = ['FINISHED', 'CANCELED', 'POSTPONED', 'SUSPENDED', 'ABANDONED', 'VOID', 'CANCELLED']
 
 export async function recoverActiveBets() {
     try {
@@ -78,12 +82,12 @@ export function updateMatchResultsIfNeeded(bets, betList) {
         Object.values(site).flatMap(bet =>
             bet && bet.events ? bet.events.filter(event => {
                 if (!event.matchResult || event.matchResult === "N/A"
-                    || ['NOT STARTED', 'TIMED'].includes(event.matchResult?.status?.toUpperCase())) {
+                    || UPCOMING_STATUSES.includes(event.matchResult?.status?.toUpperCase())) {
                     console.log("Passato da NOT STARTED")
                     const eventDate = event.date;
                     return now >= eventDate;
                 }
-                if (['IN_PLAY', 'LIVE', 'PAUSED'].includes(event.matchResult?.status?.toUpperCase())) {
+                if (LIVE_STATUSES.includes(event.matchResult?.status?.toUpperCase())) {
                     console.log("Passato da IN PLAY")
                     return now - lastRequestTime >= oneMinute;
                 }
@@ -172,7 +176,7 @@ export function updateBetDetailView(updatedBet) {
             const resultElement = eventElement.closest('.event-item').querySelector('.result');
             if (resultElement) {
                 resultElement.textContent = event.matchResult?.score;
-                resultElement.className = `result ${getStatusClass(event.matchResult?.score)}`;
+                resultElement.className = `result ${getStatusClass(event.matchResult?.status)}`;
             }
         }
     });
@@ -181,8 +185,8 @@ export function updateBetDetailView(updatedBet) {
 function getStatusClass(status) {
     if (!status) return '';
     status = status.toUpperCase();
-    if (['IN_PLAY', 'LIVE', 'PAUSED'].includes(status)) return 'in-play';
-    if (['NOT STARTED', 'TIMED'].includes(status)) return 'not-started';
+    if (LIVE_STATUSES.includes(status.toUpperCase())) return 'in-play';
+    if (UPCOMING_STATUSES.includes(status.toUpperCase())) return 'not-started';
     return '';
 }
 

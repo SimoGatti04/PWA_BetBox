@@ -10,9 +10,6 @@ import { showBetDetails } from './BetDetailView.js';
 import { formatDate, getStatusColor, showNoBetsMessage } from "./ActiveBetsUtils.js";
 
 let removedBets = {};
-export const abortControllerWrapper = {
-    controller: new AbortController()
-};
 
 export function createActiveBetsView() {
     const view = document.createElement('div');
@@ -48,7 +45,7 @@ export function createActiveBetsView() {
     setInterval(() => {
         const savedBets = loadBetsFromLocalStorage();
         updateMatchResultsIfNeeded(savedBets, betList);
-    }, 5 * 60 * 1000);
+    }, 60 * 1000);
 
 
     return view;

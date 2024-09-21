@@ -1,4 +1,5 @@
 import config from '../config.js';
+import { LIVE_STATUSES, UPCOMING_STATUSES, FINISHED_STATUSES} from "./ActiveBets/BetService.js";
 
 async function getMatchResult(events) {
     const now = Date.now();
@@ -37,11 +38,9 @@ async function getMatchResult(events) {
 function needsFetching(event, now) {
     const { matchResult } = event;
     if (!matchResult) return true;
-    if (matchResult.status === 'FINISHED') return false;
-    return !((matchResult.status === 'IN_PLAY' ||
-            matchResult.status === 'PAUSED' ||
-            matchResult.status === 'LIVE')
-        && now - matchResult.lastUpdated < 60 * 1000);
+    if (FINISHED_STATUSES.includes(matchResult.status.toUpperCase())) return false;
+    return !((LIVE_STATUSES.includes(matchResult.status.toUpperCase())
+        && now - matchResult.lastUpdated < 60 * 1000));
 }
 
 async function getResultsFromSportDevs(events) {

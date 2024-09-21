@@ -1,4 +1,6 @@
 import { formatDate, getStatusColor } from './ActiveBetsUtils.js';
+import {loadBetsFromLocalStorage} from "./BetStorageService.js";
+import {updateMatchResultsIfNeeded} from "./BetService.js";
 
 const BET_UPDATED_EVENT = 'betUpdated';
 
@@ -28,6 +30,11 @@ export function showBetDetails(bet, isHistorical = false) {
     // Modify the back button event listener
     const backButton = detailScreen.querySelector('.bet-detail-back-button');
     backButton.addEventListener('click', () => closeBetDetails(detailScreen, keyDownHandler, updateHandler));
+
+    setInterval(() => {
+        const savedBets = loadBetsFromLocalStorage();
+        updateMatchResultsIfNeeded(savedBets, bet);
+    }, 60 * 1000);
 }
 
 
@@ -66,7 +73,7 @@ function closeBetDetails(detailScreen, keyDownHandler, updateHandler) {
 function createBetDetailContent(bet, isHistorical) {
     const eventListItems = bet.events.map(event => {
         const matchResult = event.matchResult || {};
-        let isLive = ['IN_PLAY', 'LIVE', 'PAUSED'].some(status =>
+        let isLive = ['IN_PLAY', 'LIVE', 'PAUSED', 'HALFTIME', 'FIRST HALF', 'SECOND HALF'].some(status =>
             matchResult.status && matchResult.status.toUpperCase() === status
         );
         let isNotStarted = ['NOT STARTED', 'TIMED'].some(status =>
