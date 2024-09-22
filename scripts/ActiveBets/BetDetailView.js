@@ -89,7 +89,7 @@ function createBetDetailContent(bet, isHistorical) {
                     <p class="event-name"><strong>${event.name}</strong></p>
                     <p class="event-date">${formatDate(event.date)}</p>
                     <p class="event-selection">${event.marketType}: ${event.selection}</p>
-                    <div class="event-odds" style="color: ${getStatusColor(event.status, true)}">${event.odd}</div>
+                    <div class="event-odds" style="color: ${getStatusColor(event.status, true)}">${event.odds}</div>
                     <div class="${resultClass}">${resultString}</div>
                 </div>
             </li>

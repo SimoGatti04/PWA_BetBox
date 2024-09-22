@@ -37,7 +37,7 @@ async function getMatchResult(events) {
 
 function needsFetching(event, now) {
     const { matchResult } = event;
-    if (!matchResult) return true;
+    if (!matchResult || matchResult === 'N/A') return true;
     if (FINISHED_STATUSES.includes(matchResult.status.toUpperCase())) return false;
     return !((LIVE_STATUSES.includes(matchResult.status.toUpperCase())
         && now - matchResult.lastUpdated < 60 * 1000));
